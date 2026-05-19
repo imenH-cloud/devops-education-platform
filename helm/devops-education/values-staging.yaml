@@ -1,0 +1,75 @@
+# Staging environment values
+environment: staging
+
+replicaCount: 2
+
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: stagingpassword
+    database: education_staging
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+
+gateway:
+  replicaCount: 2
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+
+services:
+  - name: user-service
+    replicaCount: 2
+  - name: auth-service
+    replicaCount: 2
+  - name: activity-service
+    replicaCount: 1
+  - name: classroom-service
+    replicaCount: 1
+  - name: parent-service
+    replicaCount: 1
+  - name: student-service
+    replicaCount: 1
+  - name: teacher-service
+    replicaCount: 1
+
+frontend:
+  replicaCount: 2
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  hosts:
+    - host: api-staging.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-staging-tls
+      hosts:
+        - api-staging.example.com
+
+prometheus:
+  enabled: true
+  retention: 7d
+  storageSize: 20Gi
+
+logging:
+  enabled: true
+  type: "json"

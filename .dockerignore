@@ -1,0 +1,18 @@
+# Docker Compose exclusions
+docker-compose.override.yml
+.env.local
+.env.*.local
+.git/
+.gitignore
+.github/
+node_modules/
+npm-debug.log
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+coverage/
+dist/
+.nyc_output/

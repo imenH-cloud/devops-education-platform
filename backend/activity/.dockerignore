@@ -1,0 +1,22 @@
+node_modules/
+npm-debug.log
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+.editorconfig
+.eslintignore
+.eslintrc*
+.prettierrc*
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+dist/
+coverage/
+.nyc_output/
+# Keep test files for build
+# Keep tsconfig for build

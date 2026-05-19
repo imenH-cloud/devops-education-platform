@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-nodeport
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: gateway
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 31848
+    name: swagger-api

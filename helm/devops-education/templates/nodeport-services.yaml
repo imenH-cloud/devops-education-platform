@@ -1,0 +1,328 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: postgres
+spec:
+  type: NodePort
+  ports:
+  - port: 5432
+    targetPort: 5432
+    nodePort: 30432
+    protocol: TCP
+  selector:
+    app: postgres
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: redis
+spec:
+  type: NodePort
+  ports:
+  - port: 6379
+    targetPort: 6379
+    nodePort: 30379
+    protocol: TCP
+  selector:
+    app: redis
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: rabbitmq
+spec:
+  type: NodePort
+  ports:
+  - name: amqp
+    port: 5672
+    targetPort: 5672
+    nodePort: 30672
+    protocol: TCP
+  - name: management
+    port: 15672
+    targetPort: 15672
+    nodePort: 30015
+    protocol: TCP
+  selector:
+    app: rabbitmq
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: elasticsearch
+spec:
+  type: NodePort
+  ports:
+  - port: 9200
+    targetPort: 9200
+    nodePort: 30920
+    protocol: TCP
+  selector:
+    app: elasticsearch
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: kibana
+spec:
+  type: NodePort
+  ports:
+  - port: 5601
+    targetPort: 5601
+    nodePort: 30601
+    protocol: TCP
+  selector:
+    app: kibana
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-api-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: minio
+spec:
+  type: NodePort
+  ports:
+  - port: 9000
+    targetPort: 9000
+    nodePort: 30900
+    protocol: TCP
+  selector:
+    app: minio
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: minio
+spec:
+  type: NodePort
+  ports:
+  - port: 9001
+    targetPort: 9001
+    nodePort: 30901
+    protocol: TCP
+  selector:
+    app: minio
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: prometheus
+spec:
+  type: NodePort
+  ports:
+  - port: 9090
+    targetPort: 9090
+    nodePort: 30090
+    protocol: TCP
+  selector:
+    app: prometheus
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: grafana
+spec:
+  type: NodePort
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 30300
+    protocol: TCP
+  selector:
+    app: grafana
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: gateway
+spec:
+  type: NodePort
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 30000
+    protocol: TCP
+  selector:
+    app: gateway
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: auth-service
+spec:
+  type: NodePort
+  ports:
+  - port: 3001
+    targetPort: 3001
+    nodePort: 30001
+    protocol: TCP
+  selector:
+    app: auth-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: user-service
+spec:
+  type: NodePort
+  ports:
+  - port: 3002
+    targetPort: 3002
+    nodePort: 30002
+    protocol: TCP
+  selector:
+    app: user-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: activity-service-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: activity-service
+spec:
+  type: NodePort
+  ports:
+  - port: 3003
+    targetPort: 3003
+    nodePort: 30003
+    protocol: TCP
+  selector:
+    app: activity-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parent-service-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: parent-service
+spec:
+  type: NodePort
+  ports:
+  - port: 3004
+    targetPort: 3004
+    nodePort: 30004
+    protocol: TCP
+  selector:
+    app: parent-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-service-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: student-service
+spec:
+  type: NodePort
+  ports:
+  - port: 3005
+    targetPort: 3005
+    nodePort: 30005
+    protocol: TCP
+  selector:
+    app: student-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: classroom-service-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: classroom-service
+spec:
+  type: NodePort
+  ports:
+  - port: 3006
+    targetPort: 3006
+    nodePort: 30006
+    protocol: TCP
+  selector:
+    app: classroom-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: teacher-service-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: teacher-service
+spec:
+  type: NodePort
+  ports:
+  - port: 3007
+    targetPort: 3007
+    nodePort: 30007
+    protocol: TCP
+  selector:
+    app: teacher-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: frontend
+spec:
+  type: NodePort
+  ports:
+  - port: 4200
+    targetPort: 4200
+    nodePort: 30420
+    protocol: TCP
+  selector:
+    app: frontend

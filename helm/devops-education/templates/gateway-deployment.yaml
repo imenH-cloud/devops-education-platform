@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "devops-education.fullname" . }}-gateway
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "devops-education.labels" . | nindent 4 }}
+    service: gateway
+spec:
+  replicas: {{ .Values.gateway.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "devops-education.selectorLabels" . | nindent 6 }}
+      service: gateway
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.gateway.port }}"
+        prometheus.io/path: "/metrics"
+      labels:
+        {{- include "devops-education.selectorLabels" . | nindent 8 }}
+        service: gateway
+    spec:
+      serviceAccountName: default
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: gateway
+        image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.gateway.port }}
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: NODE_ENV
+        - name: DB_HOST
+          value: "postgres"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_PASSWORD
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_DB
+        - name: AUTH_SERVICE_HOST
+          value: "auth-service"
+        - name: AUTH_SERVICE_PORT
+          value: "3001"
+        - name: USER_SERVICE_HOST
+          value: "user-service"
+        - name: USER_SERVICE_PORT
+          value: "3002"
+        - name: ACTIVITY_SERVICE_HOST
+          value: "activity-service"
+        - name: ACTIVITY_SERVICE_PORT
+          value: "3003"
+        - name: PARENT_SERVICE_HOST
+          value: "parent-service"
+        - name: PARENT_SERVICE_PORT
+          value: "3004"
+        - name: STUDENT_SERVICE_HOST
+          value: "student-service"
+        - name: STUDENT_SERVICE_PORT
+          value: "3005"
+        - name: CLASSROOM_SERVICE_HOST
+          value: "classroom-service"
+        - name: CLASSROOM_SERVICE_PORT
+          value: "3006"
+        - name: TEACHER_SERVICE_HOST
+          value: "teacher-service"
+        - name: TEACHER_SERVICE_PORT
+          value: "3007"
+        envFrom:
+        - configMapRef:
+            name: app-config
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          {{- toYaml .Values.gateway.resources | nindent 10 }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "devops-education.labels" . | nindent 4 }}
+    service: gateway
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.gateway.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "devops-education.selectorLabels" . | nindent 4 }}
+    service: gateway

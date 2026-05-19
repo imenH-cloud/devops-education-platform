@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+data:
+  kubernetes-cluster.json: |
+    {
+      "dashboard": {
+        "title": "Kubernetes Cluster Overview",
+        "description": "DevOps Education Platform - Kubernetes Cluster Monitoring",
+        "tags": ["kubernetes", "cluster"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "title": "Cluster CPU Usage",
+            "targets": [{"expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"education\"}[5m])) by (pod_name)"}],
+            "type": "graph"
+          },
+          {
+            "title": "Cluster Memory Usage",
+            "targets": [{"expr": "sum(container_memory_usage_bytes{namespace=\"education\"}) by (pod_name) / 1024 / 1024"}],
+            "type": "graph"
+          },
+          {
+            "title": "Pod Count",
+            "targets": [{"expr": "count(kube_pod_info{namespace=\"education\"})"}],
+            "type": "stat"
+          },
+          {
+            "title": "Running Pods",
+            "targets": [{"expr": "count(kube_pod_status_phase{namespace=\"education\",phase=\"Running\"})"}],
+            "type": "stat"
+          }
+        ]
+      }
+    }
+
+  microservices-metrics.json: |
+    {
+      "dashboard": {
+        "title": "Microservices Metrics",
+        "description": "DevOps Education Platform - Microservices Performance",
+        "tags": ["microservices", "education"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "title": "Gateway Response Time",
+            "targets": [{"expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"gateway\"}[5m]))"}],
+            "type": "graph"
+          },
+          {
+            "title": "User Service Requests",
+            "targets": [{"expr": "rate(http_requests_total{job=\"user-service\"}[5m])"}],
+            "type": "graph"
+          },
+          {
+            "title": "Auth Service Latency",
+            "targets": [{"expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job=\"auth-service\"}[5m]))"}],
+            "type": "graph"
+          },
+          {
+            "title": "Activity Service Requests",
+            "targets": [{"expr": "rate(http_requests_total{job=\"activity-service\"}[5m])"}],
+            "type": "graph"
+          }
+        ]
+      }
+    }
+
+  alerts-status.json: |
+    {
+      "dashboard": {
+        "title": "Alerts Status",
+        "description": "DevOps Education Platform - Alert Status",
+        "tags": ["alerts", "warning"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "title": "High CPU Pods",
+            "targets": [{"expr": "ALERTS{alertname=\"HighPodCPU\"}"}],
+            "type": "stat"
+          },
+          {
+            "title": "High Memory Pods",
+            "targets": [{"expr": "ALERTS{alertname=\"HighPodMemory\"}"}],
+            "type": "stat"
+          },
+          {
+            "title": "Pod Restarts",
+            "targets": [{"expr": "ALERTS{alertname=\"PodRestarts\"}"}],
+            "type": "stat"
+          },
+          {
+            "title": "Services Down",
+            "targets": [{"expr": "ALERTS{alertname=\"ServiceDown\"}"}],
+            "type": "stat"
+          }
+        ]
+      }
+    }

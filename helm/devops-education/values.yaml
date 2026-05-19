@@ -1,0 +1,108 @@
+# Default values for devops-education
+replicaCount: 2
+
+environment: production
+imagePullPolicy: IfNotPresent
+
+# PostgreSQL Configuration
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: changeme
+    database: education
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+
+# API Gateway
+gateway:
+  replicaCount: 2
+  image:
+    repository: devopspfe-gateway-backend
+    tag: latest
+  port: 3000
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+
+# Microservices
+services:
+  - name: user-service
+    image: devopspfe-user-service
+    port: 3002
+    replicaCount: 2
+  - name: auth-service
+    image: devopspfe-auth-service
+    port: 3001
+    replicaCount: 2
+  - name: activity-service
+    image: devopspfe-activity-service
+    port: 3003
+    replicaCount: 1
+  - name: classroom-service
+    image: devopspfe-classroom-service
+    port: 3006
+    replicaCount: 1
+  - name: parent-service
+    image: devopspfe-parent-service
+    port: 3004
+    replicaCount: 1
+  - name: student-service
+    image: devopspfe-student-service
+    port: 3005
+    replicaCount: 1
+  - name: teacher-service
+    image: devopspfe-teacher-service
+    port: 3007
+    replicaCount: 1
+
+frontend:
+  image: devopspfe-frontend-app
+  tag: latest
+  replicaCount: 2
+  port: 4200
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-tls
+      hosts:
+        - api.example.com
+
+# Monitoring
+prometheus:
+  enabled: true
+  retention: 15d
+  storageSize: 10Gi
+
+# Logging
+logging:
+  enabled: true
+  type: "json"
+
+# Service Mesh (optional)
+istio:
+  enabled: false

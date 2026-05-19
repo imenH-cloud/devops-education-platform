@@ -1,0 +1,91 @@
+# Production environment values
+environment: production
+
+replicaCount: 3
+
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: ${POSTGRES_PASSWORD}  # Use external secret
+    database: education_prod
+  primary:
+    persistence:
+      enabled: true
+      size: 100Gi
+      storageClassName: fast-ssd
+  resources:
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+
+gateway:
+  replicaCount: 3
+  resources:
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+
+services:
+  - name: user-service
+    replicaCount: 3
+  - name: auth-service
+    replicaCount: 3
+  - name: activity-service
+    replicaCount: 2
+  - name: classroom-service
+    replicaCount: 2
+  - name: parent-service
+    replicaCount: 2
+  - name: student-service
+    replicaCount: 2
+  - name: teacher-service
+    replicaCount: 2
+
+frontend:
+  replicaCount: 3
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-tls
+      hosts:
+        - api.example.com
+
+prometheus:
+  enabled: true
+  retention: 30d
+  storageSize: 50Gi
+
+logging:
+  enabled: true
+  type: "json"
+
+# Pod Disruption Budget for high availability
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Network Policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress

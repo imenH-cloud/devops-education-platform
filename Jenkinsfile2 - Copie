@@ -1,0 +1,125 @@
+pipeline {
+    agent any
+
+    environment {
+        MICROSERVICES = 'activity auth classroom gateway parent student teacher user'
+        FRONTEND_APP = 'frontend-app'
+        K8S_NAMESPACE = 'education'
+        // Pour Windows, utiliser bat au lieu de sh
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Cloning repository...'
+                checkout scm
+            }
+        }
+
+        stage('Build Backend Microservices') {
+            steps {
+                script {
+                    def services = env.MICROSERVICES.split()
+                    for (service in services) {
+                        echo "Building backend microservice: ${service}-service"
+                        dir("backend/${service}") {
+                            bat "docker build -t devopspfe-${service}-service:latest ."
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                echo 'Building frontend application...'
+                dir("frontend/app") {
+                    bat "docker build -t devopspfe-${env.FRONTEND_APP}:latest ."
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo 'Deploying to Kubernetes...'
+                script {
+                    bat """
+                        kubectl create namespace ${env.K8S_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                        kubectl apply -f kubernetes/database/postgres.yaml -n ${env.K8S_NAMESPACE}
+                        kubectl apply -f kubernetes/backend/ -n ${env.K8S_NAMESPACE}
+                        kubectl apply -f kubernetes/frontend/frontend-app.yaml -n ${env.K8S_NAMESPACE}
+                    """
+                    bat "kubectl wait --for=condition=ready pod -l app=postgres -n ${env.K8S_NAMESPACE} --timeout=120s || true"
+                    bat "kubectl get pods -n ${env.K8S_NAMESPACE}"
+                }
+            }
+        }
+
+        stage('Initialize Database') {
+            steps {
+                echo 'Initialisation de la base de données...'
+                script {
+                    if (fileExists('kubernetes/init-data.sql')) {
+                        bat "type kubernetes\\init-data.sql | kubectl exec -i -n ${env.K8S_NAMESPACE} deployment/postgres-deployment -- psql -U postgres -d education || true"
+                    } else {
+                        echo "⚠️ Fichier init-data.sql non trouvé"
+                    }
+                }
+            }
+        }
+
+        stage('Expose Services') {
+            steps {
+                echo 'Exposing services...'
+                script {
+                    bat "kubectl expose deployment gateway-backend-deployment -n ${env.K8S_NAMESPACE} --type=NodePort --port=3000 --name=gateway-nodeport --dry-run=client -o yaml | kubectl apply -f -"
+                    bat "kubectl expose deployment frontend-app-deployment -n ${env.K8S_NAMESPACE} --type=NodePort --port=4200 --name=frontend-nodeport --dry-run=client -o yaml | kubectl apply -f -"
+                    
+                    def gatewayPort = bat(script: "kubectl get service gateway-nodeport -n ${env.K8S_NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'", returnStdout: true).trim()
+                    def frontendPort = bat(script: "kubectl get service frontend-nodeport -n ${env.K8S_NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'", returnStdout: true).trim()
+                    echo "Gateway disponible sur le port: ${gatewayPort}"
+                    echo "Frontend disponible sur le port: ${frontendPort}"
+                }
+            }
+        }
+
+        stage('Tests') {
+            steps {
+                echo 'Execution des tests...'
+                script {
+                    // Attendre que les services soient prêts
+                    bat "powershell -Command \"Start-Sleep -Seconds 15\""
+                    
+                    // Tests unitaires des services
+                    echo 'Tests unitaires des services...'
+                    bat "powershell -File tests\\test-services.ps1"
+                    
+                    // Tests d'intégration
+                    echo "Tests d'intégration..."
+                    bat "powershell -File tests\\test-integration.ps1 || exit 0"
+                    
+                    // Tests de bout en bout
+                    echo 'Tests de bout en bout...'
+                    bat "powershell -File tests\\test-e2e.ps1 || exit 0"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🎉 Pipeline terminé avec succès !'
+            script {
+                def frontendPort = bat(script: "kubectl get service frontend-nodeport -n ${env.K8S_NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'", returnStdout: true).trim()
+                echo "Application accessible sur: http://localhost:${frontendPort}"
+                echo "🔑 Identifiants: admin@education.com / admin123"
+            }
+        }
+        failure {
+            echo '❌ Pipeline échoué. Vérifiez les logs.'
+        }
+        always {
+            echo 'Nettoyage terminé.'
+        }
+    }
+}

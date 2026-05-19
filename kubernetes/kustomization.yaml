@@ -1,0 +1,23 @@
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - secrets.yaml
+  - configmap.yaml
+  - network-policies.yaml
+  - database/postgres.yaml
+  - database/migrate.yaml
+  - backend/user-service.yaml
+  - backend/auth-service.yaml
+  - backend/activity-service.yaml
+  - backend/classroom-service.yaml
+  - backend/parent-service.yaml
+  - backend/student-service.yaml
+  - backend/teacher-service.yaml
+  - backend/gateway-backend.yaml
+  - frontend/frontend-app.yaml
+  - ingress.yaml
+  - monitoring/prometheus-config.yaml
+  - monitoring/prometheus-deployment.yaml
+  - monitoring/grafana-deployment.yaml
