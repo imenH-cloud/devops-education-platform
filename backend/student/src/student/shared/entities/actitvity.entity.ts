@@ -37,7 +37,7 @@ export class Activity {
   @Column({ default: false })
   isCompleted: boolean;
 
-@Column()
+@Column({ nullable: true })
 classroom: number; 
 
   @Column({ type: 'simple-json', nullable: true })

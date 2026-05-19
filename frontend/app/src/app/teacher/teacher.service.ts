@@ -1,49 +1,37 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface Teacher {
   id?: number;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  subject: string;
+  phoneNumber: string;
+  specialization: string;
+  qualification: string;
+  experience: number;
+  availability: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TeacherService {
-  private baseUrl = `${environment.apiUrl}/teachers`;
-
-  constructor(private http: HttpClient) {}
-
-  create(teacher: Teacher): Observable<Teacher> {
-    return this.http.post<Teacher>(`${this.baseUrl}`, teacher);
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/teachers`;
+  
+  getAll(): Observable<Teacher[]> { 
+    return this.http.get<any>(this.apiUrl).pipe(
+      map(response => response.items || response || [])
+    );
   }
-
-  findAll(page: number = 1, limit: number = 10): Observable<any> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('limit', limit.toString());
-    return this.http.get<any>(`${this.baseUrl}`, { params });
+  
+  create(teacher: Teacher): Observable<Teacher> { 
+    return this.http.post<Teacher>(this.apiUrl, teacher); 
   }
-
-  findOne(id: number): Observable<Teacher> {
-    return this.http.get<Teacher>(`${this.baseUrl}/${id}`);
-  }
-
-  update(id: number, teacher: Partial<Teacher>): Observable<Teacher> {
-    return this.http.patch<Teacher>(`${this.baseUrl}/${id}`, teacher);
-  }
-
-  delete(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
-  }
-
-  search(query: string): Observable<Teacher[]> {
-    return this.http.get<Teacher[]>(`${this.baseUrl}/search`, {
-      params: new HttpParams().set('query', query)
-    });
+  
+  delete(id: number): Observable<any> { 
+    return this.http.delete(`${this.apiUrl}/${id}`); 
   }
 }

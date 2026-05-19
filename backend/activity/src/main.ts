@@ -5,12 +5,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Swagger config
   const config = new DocumentBuilder()
-    .setTitle('Education Platform Gateway')
-    .setDescription('Gateway API for the Education platform')
+    .setTitle('Activity Service')
+    .setDescription('API pour la gestion des activités')
     .setVersion('1.0')
-    .addTag('gateway')
+    .addTag('activities')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -18,10 +17,7 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Gateway écoute sur 3000
-  await app.listen(3002, '0.0.0.0');
-
-  console.log(`Gateway is running at http://localhost:3003`);
-  console.log(`Swagger is available at http://localhost:3003/api`);
+  await app.listen(3003, '0.0.0.0');
+  console.log('Activity service running on port 3003');
 }
 bootstrap();

@@ -9,7 +9,7 @@ export class Activity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   type: string;
 
   @Column({ nullable: true })
@@ -27,8 +27,15 @@ export class Activity {
   @Column({ default: false })
   isCompleted: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   classroomId: number;
+
+  @Column({ type: 'simple-json', nullable: true })
+  metadata: {
+    resources?: string[];
+    attachments?: string[];
+    comments?: string;
+  };
 
   @ManyToOne(() => Classroom, classroom => classroom.activities)
   classroom: Classroom;

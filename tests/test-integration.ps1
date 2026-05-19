@@ -3,7 +3,7 @@ Write-Host "=== TESTS D'INTÉGRATION ===" -ForegroundColor Cyan
 
 $baseUrl = "http://localhost:31848
 
-# 1. Créer un nouvel enseignant
+# 1. Créer un nouvel enseignantsss
 Write-Host "`n1. Création d'un enseignant de test..." -ForegroundColor Yellow
 $loginBody = @{email="admin@education.com"; password="admin123"} | ConvertTo-Json
 $response = Invoke-RestMethod -Uri "$baseUrl/auth/login" -Method POST -Body $loginBody -ContentType "application/json"

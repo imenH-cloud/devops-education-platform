@@ -44,7 +44,7 @@ export class AddComponent {
   ngOnInit(): void {
     this.classroomService.findAll().subscribe({
       next: (res: any) => (this.classrooms = res),
-      error: (err) => console.error('Error loading classrooms:', err)
+      error: (err) => console.error('Erreur lors du chargement des salles:', err)
     });
   }
 
@@ -54,23 +54,38 @@ export class AddComponent {
 
   onSubmit(): void {
     this.submitted = true;
-    if (this.activityForm.invalid) return;
+    if (this.activityForm.invalid) {
+      console.log('Le formulaire n\'est pas valide');
+      return;
+    }
 
     const formValue = this.activityForm.value;
+    console.log('Envoi des données:', formValue);
 
     const activityPayload = {
-      ...formValue,
+      name: formValue.name,
+      type: formValue.type,
+      description: formValue.description,
+      location: formValue.location,
+      date: formValue.date,
+      duration: formValue.duration,
+      isCompleted: formValue.isCompleted,
+      classroomId: formValue.classroomId,
       metadata: {
-        resources: formValue.metadata.resources?.split(',') || [],
-        attachments: formValue.metadata.attachments?.split(',') || [],
+        resources: formValue.metadata.resources?.split(',').map((r: string) => r.trim()) || [],
+        attachments: formValue.metadata.attachments?.split(',').map((a: string) => a.trim()) || [],
         comments: formValue.metadata.comments || ''
-      },
-      classroom: formValue.classroomId
+      }
     };
 
+    console.log('Payload de l\'activité:', activityPayload);
+
     this.activityService.create(activityPayload).subscribe({
-      next: () => this.router.navigate(['/activity']),
-      error: (err) => console.error('Error creating activity:', err)
+      next: () => {
+        console.log('Activité créée avec succès');
+        this.router.navigate(['/activity']);
+      },
+      error: (err) => console.error('Erreur de création:', err)
     });
   }
 

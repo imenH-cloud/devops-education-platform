@@ -1,34 +1,14 @@
 ﻿import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { MetricsController } from './metrics/metrics.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';;
-import { TeacherModule } from './teacher/teacher.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TeacherController } from './teacher.controller';
+import { TeacherService } from './teacher.service';
+import { Teacher } from './teacher.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.AUTH_SERVICE_HOST || 'localhost',
-          port: process.env.AUTH_SERVICE_PORT ? parseInt(process.env.AUTH_SERVICE_PORT, 10) : 3000,
-        },
-      },
-      {
-        name: 'USER_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.USER_SERVICE_HOST || 'localhost',
-          port: process.env.USER_SERVICE_PORT ? parseInt(process.env.USER_SERVICE_PORT, 10) : 3002,
-        },
-      },
-    ]),
-   TypeOrmModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -38,20 +18,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         username: configService.get<string>('DB_USERNAME', 'postgres'),
         password: configService.get<string>('DB_PASSWORD', 'postgres'),
         database: configService.get<string>('DB_NAME', 'education'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        entities: [Teacher],
         synchronize: true,
       }),
     }),
-
-    
-
-    
- 
-    
-    TeacherModule,
+    TypeOrmModule.forFeature([Teacher]),
   ],
-  controllers: [AppController, MetricsController],
-  providers: [AppService],
+  controllers: [TeacherController],
+  providers: [TeacherService],
 })
 export class AppModule {}
-

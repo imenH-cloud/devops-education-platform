@@ -11,11 +11,12 @@ import { ClassroomModule } from './classroom/classroom.module';
 import { ActivityModule } from './activity/activity.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { RouterModule } from '@angular/router';
-import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { AuthInterceptor } from './auth/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -41,9 +42,13 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
     TeacherModule,
   ],
   providers: [
-    provideHttpClient(withFetch()), 
+    provideHttpClient(withFetch()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
-

@@ -1,8 +1,8 @@
 import {
   Title
-} from "./chunk-JVV2EM62.js";
-import "./chunk-E2D5ANBE.js";
-import "./chunk-X3S3AJTT.js";
+} from "./chunk-U7EJXFML.js";
+import "./chunk-UAYASOED.js";
+import "./chunk-SEMTAG5H.js";
 import {
   HashLocationStrategy,
   LOCATION_INITIALIZED,
@@ -10,26 +10,22 @@ import {
   LocationStrategy,
   PathLocationStrategy,
   ViewportScroller
-} from "./chunk-PWZXF6Y3.js";
-import "./chunk-U44TYWUZ.js";
+} from "./chunk-RAKJRQG3.js";
+import "./chunk-EFUI5DNY.js";
 import {
   APP_BOOTSTRAP_LISTENER,
   ApplicationRef,
   Attribute,
-  BehaviorSubject,
   ChangeDetectorRef,
   Compiler,
   Component,
-  ConnectableObservable,
   Console,
   ContentChildren,
   DOCUMENT,
   DestroyRef,
   Directive,
-  EMPTY,
   ENVIRONMENT_INITIALIZER,
   ElementRef,
-  EmptyError,
   EnvironmentInjector,
   EventEmitter,
   HostAttributeToken,
@@ -44,61 +40,32 @@ import {
   NgModule,
   NgModuleFactory$1,
   NgZone,
-  Observable,
   Optional,
   Output,
   PendingTasksInternal,
   Renderer2,
   RuntimeError,
   SkipSelf,
-  Subject,
-  Subscription,
   Version,
   ViewContainerRef,
   afterNextRender,
   booleanAttribute,
-  catchError,
-  combineLatest,
-  concat,
-  concatMap,
   createEnvironmentInjector,
-  defaultIfEmpty,
-  defer,
-  filter,
-  finalize,
-  first,
   formatRuntimeError,
-  from,
   inject,
   input,
   isInjectable,
   isNgModule,
-  isObservable,
   isPromise,
   isStandalone,
-  last,
   makeEnvironmentProviders,
-  map,
-  mergeAll,
-  mergeMap,
-  of,
   performanceMarkFeature,
-  pipe,
   provideAppInitializer,
   publishExternalGlobalUtil,
-  refCount,
   reflectComponentType,
   runInInjectionContext,
-  scan,
   setClassMetadata,
   signal,
-  startWith,
-  switchMap,
-  take,
-  takeLast,
-  takeUntil,
-  tap,
-  throwError,
   untracked,
   ɵɵNgOnChangesFeature,
   ɵɵattribute,
@@ -118,7 +85,42 @@ import {
   ɵɵloadQuery,
   ɵɵqueryRefresh,
   ɵɵsanitizeUrlOrResourceUrl
-} from "./chunk-BBD2RTAP.js";
+} from "./chunk-D3NIATU7.js";
+import {
+  BehaviorSubject,
+  ConnectableObservable,
+  EMPTY,
+  EmptyError,
+  Observable,
+  Subject,
+  Subscription,
+  catchError,
+  combineLatest,
+  concat,
+  concatMap,
+  defaultIfEmpty,
+  defer,
+  filter,
+  finalize,
+  first,
+  from,
+  isObservable,
+  last,
+  map,
+  mergeAll,
+  mergeMap,
+  of,
+  pipe,
+  refCount,
+  scan,
+  startWith,
+  switchMap,
+  take,
+  takeLast,
+  takeUntil,
+  tap,
+  throwError
+} from "./chunk-RSS3ODKE.js";
 import {
   __async,
   __spreadProps,
@@ -6041,7 +6043,7 @@ function mapToCanDeactivate(providers) {
 function mapToResolve(provider) {
   return (...params) => inject(provider).resolve(...params);
 }
-var VERSION = new Version("20.3.19");
+var VERSION = new Version("20.3.20");
 export {
   ActivatedRoute,
   ActivatedRouteSnapshot,

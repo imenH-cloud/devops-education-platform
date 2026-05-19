@@ -20,45 +20,15 @@ export class AddComponent {
     private router: Router
   ) {
     this.teacherForm = this.fb.group({
-      indexNumber: ['', [
-        Validators.required,
-        Validators.pattern(/^[A-Z]{3}\d{4}$/)
-      ]],
-      cin: ['', [
-        Validators.required,
-        Validators.pattern(/^\d{8}$/)
-      ]],
-      firstName: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(50),
-        Validators.pattern(/^[a-zA-ZÀ-ÿ\s]+$/)
-      ]],
-      surname: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(50),
-        Validators.pattern(/^[a-zA-ZÀ-ÿ\s]+$/)
-      ]],
+      indexNumber: ['', Validators.required],
+      cin: ['', Validators.required],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      surname: ['', [Validators.required, Validators.minLength(2)]],
       gender: ['', Validators.required],
-      address: ['', [
-        Validators.required,
-        Validators.minLength(10),
-        Validators.maxLength(200)
-      ]],
-      telephone: ['', [
-        Validators.required,
-        Validators.pattern(/^[\+]?[0-9\s\-()]{8,15}$/)
-      ]],
-      email: ['', [
-        Validators.required,
-        Validators.email,
-        Validators.maxLength(100)
-      ]],
-      password: ['', [
-        Validators.required,
-        Validators.minLength(6)
-      ]],
+      address: ['', Validators.required],
+      telephone: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       facebook: [''],
       instagram: [''],
       linkedin: [''],
@@ -77,10 +47,12 @@ export class AddComponent {
   onSubmit(): void {
     this.submitted = true;
     if (this.teacherForm.invalid) {
+      console.log('Form invalid:', this.teacherForm.errors);
       return;
     }
 
     const teacherData = this.teacherForm.value;
+    console.log('Submitting teacher:', teacherData);
 
     this.teacherService.create(teacherData).subscribe({
       next: (res:any) => {

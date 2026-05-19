@@ -8,7 +8,7 @@ import { Login } from '../auth';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  standalone: false  // AJOUTEZ CETTE LIGNE
+  standalone: false
 })
 export class LoginComponent {
   loginForm!: FormGroup;
@@ -19,7 +19,7 @@ export class LoginComponent {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
-    private readonly AuthService: AuthService
+    private readonly authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -39,28 +39,66 @@ export class LoginComponent {
   }
 
   async onSubmit(): Promise<void> {
-    console.log("user", this.loginForm.value)
+    console.log("Form value:", this.loginForm.value);
+    
+    if (this.loginForm.invalid) {
+      this.markFormGroupTouched();
+      return;
+    }
 
     this.error = '';
     this.isLoading = true;
 
     try {
-      const credentials: any = this.loginForm.value;
-      console.log("credentials", credentials)
+      const credentials: Login = this.loginForm.value;
+      console.log("Sending credentials:", credentials);
       
-      this.AuthService.loginUser(credentials as Login).subscribe({
+      this.authService.loginUser(credentials).subscribe({
         next: (response) => { 
-          console.log('Connexion réussie', response);
-          document.cookie = `token=${response.access_token}; path=/; max-age=3600`; 
-          document.cookie = `id=${response.idUser}; path=/; max-age=3600`; 
+          console.log('✅ Connexion réussie', response);
+          
+          // Stocker le token et l'ID utilisateur
+          if (response.access_token) {
+            // Utiliser localStorage pour plus de fiabilité
+            localStorage.setItem('token', response.access_token);
+            localStorage.setItem('idUser', response.idUser);
+            
+            // Aussi stocker dans les cookies
+            document.cookie = `token=${response.access_token}; path=/; max-age=${24 * 60 * 60}`;
+            document.cookie = `idUser=${response.idUser}; path=/; max-age=${24 * 60 * 60}`;
+            
+            console.log('✅ Token stocké');
+            
+            // Rediriger vers le dashboard
+            this.isLoading = false;
+            this.router.navigate(['/dashboard']).catch(err => {
+              console.error('Erreur de navigation:', err);
+              // Fallback: redirection directe
+              window.location.href = '/dashboard';
+            });
+          } else {
+            throw new Error('Pas de token reçu');
+          }
+        },
+        error: (error) => {
+          console.error('❌ Erreur de connexion:', error);
+          this.isLoading = false;
+          
+          // Améliorer le message d'erreur
+          if (error.status === 401) {
+            this.error = 'Email ou mot de passe incorrect';
+          } else if (error.status === 0) {
+            this.error = 'Impossible de se connecter au serveur. Vérifiez votre connexion.';
+          } else if (error.error?.message) {
+            this.error = error.error.message;
+          } else {
+            this.error = 'Erreur de connexion. Veuillez réessayer.';
+          }
         }
       });
-      
-      window.location.href = '/user'  // URL relative
     } catch (error) {
-      this.error = error instanceof Error ? error.message : 'Erreur de connexion';
-    } finally {
       this.isLoading = false;
+      this.error = error instanceof Error ? error.message : 'Erreur de connexion';
     }
   }
 
@@ -70,10 +108,6 @@ export class LoginComponent {
       control?.markAsTouched();
     });
   }
-
-  get username() { return this.loginForm.get('username'); }
-  get password() { return this.loginForm.get('password'); }
-  get rememberMe() { return this.loginForm.get('rememberMe'); }
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);

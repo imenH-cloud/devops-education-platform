@@ -40,20 +40,35 @@ export class AppController {
   @Get('activities')
   getActivities() { return this.appService.getActivities(); }
 
+  @Get('activity')
+  getActivitiesAlt() { return this.appService.getActivities(); }
+
   @Get('activities/:id')
   getActivityById(@Param('id') id: string) { return this.appService.getActivityById(id); }
+
+  @Get('activity/:id')
+  getActivityByIdAlt(@Param('id') id: string) { return this.appService.getActivityById(id); }
 
   @Post('activities')
   createActivity(@Body() createActivityDto: any) { return this.appService.createActivity(createActivityDto); }
 
+  @Post('activity')
+  createActivityAlt(@Body() createActivityDto: any) { return this.appService.createActivity(createActivityDto); }
+
   @Patch('activities/:id')
   updateActivity(@Param('id') id: string, @Body() updateActivityDto: any) { return this.appService.updateActivity(id, updateActivityDto); }
+
+  @Patch('activity/:id')
+  updateActivityAlt(@Param('id') id: string, @Body() updateActivityDto: any) { return this.appService.updateActivity(id, updateActivityDto); }
 
   @Put('activities/:id/complete')
   completeActivity(@Param('id') id: string) { return this.appService.completeActivity(id); }
 
   @Delete('activities/:id')
   deleteActivity(@Param('id') id: string) { return this.appService.deleteActivity(id); }
+
+  @Delete('activity/:id')
+  deleteActivityAlt(@Param('id') id: string) { return this.appService.deleteActivity(id); }
 
   // Parent Service Endpoints
   @Get('parent')

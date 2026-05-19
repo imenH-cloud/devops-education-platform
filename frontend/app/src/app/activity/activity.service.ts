@@ -1,47 +1,38 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Activity } from './activity';
 import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface Activity {
+  id?: number;
+  title?: string;
+  name?: string;
+  description: string;
+  studentId?: number;
+  type: string;
+  date: string;
+  duration: number;
+  notes?: string;
+  location?: string;
+  isCompleted?: boolean;
+  classroom?: { id: number };
+  classroomId?: number;
+  metadata?: {
+    resources?: string[];
+    attachments?: string[];
+    comments?: string;
+  };
+}
+
+@Injectable({ providedIn: 'root' })
 export class ActivityService {
-  private apiUrl = `${environment.apiUrl}/activities`;
-
-  constructor(private http: HttpClient) {}
-
-  create(activity: Partial<Activity>): Observable<any> {
-    return this.http.post<Activity>(this.apiUrl, activity);
-  }
-
-  getAll(page: number = 1, limit: number = 10): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('limit', limit.toString());
-    return this.http.get<{ data: any[], total: number }>(this.apiUrl, { params });
-  }
-
-  search(query: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/search`, {
-      params: new HttpParams().set('query', query)
-    });
-  }
-
-  getById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
-  }
-
-  update(id: number, activity: Partial<any>): Observable<any> {
-    return this.http.patch<Activity>(`${this.apiUrl}/${id}`, activity);
-  }
-
-  markAsComplete(id: number): Observable<any> {
-    return this.http.put<Activity>(`${this.apiUrl}/${id}/complete`, {});
-  }
-
-  delete(id: number): Observable<any> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/activity`;
+  
+  getAll(): Observable<Activity[]> { return this.http.get<Activity[]>(this.apiUrl); }
+  findAll(): Observable<Activity[]> { return this.getAll(); }
+  getById(id: number): Observable<Activity> { return this.http.get<Activity>(`${this.apiUrl}/${id}`); }
+  create(activity: Activity): Observable<Activity> { return this.http.post<Activity>(this.apiUrl, activity); }
+  update(id: number, activity: Activity): Observable<Activity> { return this.http.patch<Activity>(`${this.apiUrl}/${id}`, activity); }
+  delete(id: number): Observable<any> { return this.http.delete(`${this.apiUrl}/${id}`); }
 }

@@ -1,52 +1,294 @@
+# 🌟 Horizons TSA - DevOps Education Platform
 
-# Correction et Complétion du PFE DevOps
+**Platform for managing specialized education activities with modern DevOps practices**
 
-Ce document résume les corrections et les ajouts effectués sur votre projet de fin d'études (PFE) DevOps pour répondre aux exigences de votre soutenance.
+---
 
-## 1. Jenkinsfile Complet
-Le `Jenkinsfile` a été entièrement réécrit pour gérer l'ensemble des **8 microservices** ainsi que l'application **frontend**.
-- **Build & Push** : Automatisation de la construction des images Docker pour chaque service.
-- **Multi-services** : Intégration de `user`, `auth`, `activity`, `classroom`, `parent`, `student`, `teacher`, `gateway` et `frontend`.
-- **Déploiement** : Ajout d'une étape pour appliquer les manifestes Kubernetes.
+## 🎯 Project Overview
 
-## 2. Manifestes Kubernetes (K8s)
-Un dossier `kubernetes/` a été créé, contenant les configurations nécessaires pour déployer votre application sur un cluster K8s :
-- **Base de données** : Déploiement de PostgreSQL avec un volume persistant (PVC).
-- **Backend** : Manifestes (Deployment & Service) pour les 8 microservices.
-- **Frontend** : Manifeste pour l'application Angular.
-- **Kustomization** : Utilisation de `kustomization.yaml` pour une gestion simplifiée de toutes les ressources.
+Horizons TSA is a comprehensive web platform built with modern DevOps architecture:
 
-## 3. GitOps avec ArgoCD
-Un dossier `argocd/` a été ajouté avec un fichier `application.yaml`.
-- Ce fichier permet à ArgoCD de surveiller votre dépôt Git et de synchroniser automatiquement l'état du cluster avec vos manifestes Kubernetes.
-- **Automatisation** : Activation de l'auto-sync et du self-healing.
+- **Frontend:** Angular 20
+- **Backend:** 9 NestJS Microservices + API Gateway
+- **Database:** PostgreSQL
+- **Orchestration:** Kubernetes
+- **DevOps:** Docker + ArgoCD (GitOps) + Jenkins CI/CD
+- **Monitoring:** Prometheus + Grafana
+- **Logging:** Elasticsearch + Kibana
+- **Cache:** Redis
+- **Project Management:** Jira SCRUM
 
-## 4. Monitoring (Prometheus & Grafana)
-Le monitoring a été intégré dans le dossier `kubernetes/monitoring/` :
-- **Prometheus** : Configuré pour scraper automatiquement les métriques de tous vos microservices et du cluster.
-- **Grafana** : Déployé pour visualiser les métriques (accessible via un service LoadBalancer).
-- **RBAC** : Configuration des rôles et permissions nécessaires pour que Prometheus puisse accéder aux données du cluster.
+---
 
-## Structure du Projet Corrigé
-```text
-.
-├── Jenkinsfile              # Pipeline CI/CD complet
-├── argocd/                  # Configuration ArgoCD
-│   └── application.yaml
-├── kubernetes/              # Manifestes K8s
-│   ├── backend/             # 8 microservices
-│   ├── database/            # PostgreSQL
-│   ├── frontend/            # App Frontend
-│   ├── monitoring/          # Prometheus & Grafana
-│   └── kustomization.yaml   # Gestionnaire de ressources
-├── backend/                 # Code source backend
-├── frontend/                # Code source frontend
-└── README_CORRECTED.md      # Ce guide
+## ✨ Features
+
+### Activity Management ✅
+- List all activities
+- Add new activity with form validation
+- Real-time list refresh
+- Backend API integration
+
+### Teacher Management ✅
+- List all teachers
+- Add new teacher with form validation
+- Real-time list refresh
+- API integration
+
+### User System ✅
+- Authentication & Authorization
+- User profile menu
+- Role-based access
+- Logout functionality
+
+### Supporting Modules ✅
+- Student management
+- Parent management
+- Classroom management
+- User management
+
+---
+
+## 🏗️ Architecture
+
+```
+┌──────────────────────┐
+│   Angular Frontend   │
+│  (Port 31927)        │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│   API Gateway        │
+│  (Port 31000)        │
+└─┬─────────┬─────────┬┘
+  │         │         │
+  ▼         ▼         ▼
+┌────┐  ┌────┐  ┌────┐
+│Act.│  │Tea.│  │Oth.│
+│Svc│  │Svc │  │Svc │
+└─┬──┘  └─┬──┘  └─┬──┘
+  │       │       │
+  └───────┼───────┘
+          ▼
+    ┌──────────────┐
+    │ PostgreSQL   │
+    │  Database    │
+    └──────────────┘
 ```
 
-## Instructions pour la Soutenance
-1. **Docker Registry** : Remplacez `your-docker-registry` dans le `Jenkinsfile` et les fichiers YAML par votre identifiant Docker Hub.
-2. **ArgoCD** : Appliquez le fichier `argocd/application.yaml` sur votre cluster où ArgoCD est installé.
-3. **Monitoring** : Une fois déployé, accédez à Grafana (admin/admin par défaut) pour créer vos tableaux de bord.
+---
 
-Bonne chance pour votre soutenance !
+## 🐳 Docker Images
+
+**All images available on Docker Hub:** `eline2016`
+
+```
+✅ eline2016/horizons-frontend:v1
+✅ eline2016/devopspfe-activity-service:v1
+✅ eline2016/devopspfe-teacher-service:v1
+✅ eline2016/devopspfe-gateway-backend:v1
+✅ eline2016/devopspfe-auth-service:v1
+✅ eline2016/devopspfe-user-service:v1
+✅ eline2016/devopspfe-parent-service:v1
+✅ eline2016/devopspfe-student-service:v1
+✅ eline2016/devopspfe-classroom-service:v1
+```
+
+---
+
+## 📂 Project Structure
+
+```
+.
+├── frontend/                 # Angular application
+│   ├── app/                 # Source code
+│   ├── Dockerfile.prod      # Production build
+│   └── nginx.conf           # Web server config
+│
+├── backend/                 # NestJS microservices
+│   ├── activity/            # Activity service
+│   ├── teacher/             # Teacher service
+│   ├── gateway/             # API Gateway
+│   ├── auth/                # Auth service
+│   ├── user/                # User service
+│   ├── parent/              # Parent service
+│   ├── student/             # Student service
+│   └── classroom/           # Classroom service
+│
+├── argocd/                  # ArgoCD configuration
+│   ├── projects/            # AppProject definitions
+│   ├── applications/        # Application manifests
+│   └── configs/             # Configuration files
+│
+├── kubernetes/              # K8s manifests (optional)
+│
+├── Jenkinsfile              # CI/CD pipeline
+└── README.md                # This file
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+```bash
+# Docker Desktop (includes Kubernetes)
+# Kubernetes cluster running
+# kubectl configured
+```
+
+### Access Points
+```
+Frontend:   http://localhost:31927
+Gateway:    http://localhost:31000
+Grafana:    http://localhost:30500
+Prometheus: http://localhost:30090
+```
+
+### Login Credentials
+```
+Username: admin@school.com
+Password: admin12345
+```
+
+---
+
+## 🔄 Deployment
+
+### Via ArgoCD (GitOps)
+```bash
+# Apply AppProject
+kubectl apply -f argocd/projects/education-app-project.yaml
+
+# Apply Applications
+kubectl apply -f argocd/applications/01-frontend.yaml
+kubectl apply -f argocd/applications/02-all-services.yaml
+
+# Verify
+kubectl get applications -n argocd
+```
+
+### Via Kubernetes
+```bash
+kubectl apply -f kubernetes/
+kubectl get pods -n education
+```
+
+### Via Jenkins CI/CD
+```bash
+# Trigger Jenkins pipeline
+# Builds, tests, and deploys automatically
+```
+
+---
+
+## 📊 Kubernetes Namespaces
+
+```
+✅ education    - Main application (10 pods)
+✅ argocd      - GitOps deployment
+✅ monitoring  - Prometheus + Grafana
+✅ cache       - Redis
+✅ logging     - Elasticsearch + Kibana
+✅ jenkins     - CI/CD pipeline
+```
+
+---
+
+## 🛠️ DevOps Stack
+
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| Docker | Containerization | ✅ |
+| Kubernetes | Orchestration | ✅ |
+| ArgoCD | GitOps | ✅ |
+| Jenkins | CI/CD | ✅ |
+| Prometheus | Metrics | ✅ |
+| Grafana | Visualization | ✅ |
+| Elasticsearch | Logs | ✅ |
+| Kibana | Log UI | ✅ |
+| Redis | Cache | ✅ |
+| Jira | Project Mgmt | ✅ |
+
+---
+
+## 📚 Documentation
+
+- **[KUBERNETES_NAMESPACES.md](KUBERNETES_NAMESPACES.md)** - All namespaces overview
+- **[argocd/README_ARGOCD.md](argocd/README_ARGOCD.md)** - ArgoCD setup
+- **[argocd/DEPLOYMENT_GUIDE.md](argocd/DEPLOYMENT_GUIDE.md)** - Deployment guide
+- **[PROJECT_COMPLETION_SUMMARY.md](PROJECT_COMPLETION_SUMMARY.md)** - Final summary
+
+---
+
+## 🔗 Related Repositories
+
+- **GitOps Config:** https://github.com/imenH-cloud/devops-education-platform-gitops
+- **Docker Hub:** https://hub.docker.com/u/eline2016
+- **Jira Board:** https://imen-hamada.atlassian.net/jira/software/projects/SCRUM/summary
+
+---
+
+## 📋 Useful Commands
+
+```bash
+# Check all pods
+kubectl get pods -n education
+
+# View logs
+kubectl logs -n education deployment/frontend-app-deployment
+
+# Port forward
+kubectl port-forward svc/frontend-app 8080:3000 -n education
+
+# Describe pod
+kubectl describe pod <pod-name> -n education
+
+# Check services
+kubectl get svc -n education
+
+# Verify deployment
+kubectl rollout status deployment/frontend-app-deployment -n education
+```
+
+---
+
+## 🎓 For Defense/Soutenance
+
+✅ All services functional  
+✅ Frontend responsive & working  
+✅ Real-time CRUD operations  
+✅ User profile menu implemented  
+✅ Docker images pushed  
+✅ ArgoCD configured  
+✅ Monitoring operational  
+✅ Documentation complete  
+
+---
+
+## 🤝 Team
+
+**Student:** IMEN HAMADA  
+**Project:** Horizons TSA - DevOps Education Platform  
+**Date:** 2026-05-19  
+
+---
+
+## 📞 Support
+
+For issues or questions:
+1. Check logs: `kubectl logs -n education <pod>`
+2. Check events: `kubectl get events -n education`
+3. Review documentation in `/argocd/` folder
+4. Check Jira board: https://imen-hamada.atlassian.net/
+
+---
+
+**Status:** ✅ Production Ready  
+**Last Updated:** 2026-05-19
+
+---
+
+## 📖 License
+
+Educational Project - Horizons TSA

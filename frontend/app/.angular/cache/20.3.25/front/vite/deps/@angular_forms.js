@@ -1,7 +1,7 @@
 import {
   getDOM
-} from "./chunk-PWZXF6Y3.js";
-import "./chunk-U44TYWUZ.js";
+} from "./chunk-RAKJRQG3.js";
+import "./chunk-EFUI5DNY.js";
 import {
   ApplicationRef,
   ChangeDetectorRef,
@@ -22,18 +22,14 @@ import {
   RuntimeError,
   Self,
   SkipSelf,
-  Subject,
   Version,
   afterNextRender,
   booleanAttribute,
   computed,
-  forkJoin,
   forwardRef,
-  from,
   inject,
   isPromise,
   isSubscribable,
-  map,
   setClassMetadata,
   signal,
   untracked,
@@ -49,7 +45,13 @@ import {
   ɵɵdirectiveInject,
   ɵɵgetInheritedFactory,
   ɵɵlistener
-} from "./chunk-BBD2RTAP.js";
+} from "./chunk-D3NIATU7.js";
+import {
+  Subject,
+  forkJoin,
+  from,
+  map
+} from "./chunk-RSS3ODKE.js";
 import {
   __spreadProps,
   __spreadValues
@@ -6812,7 +6814,7 @@ var UntypedFormBuilder = class _UntypedFormBuilder extends FormBuilder {
     }]
   }], null, null);
 })();
-var VERSION = new Version("20.3.19");
+var VERSION = new Version("20.3.20");
 var FormsModule = class _FormsModule {
   /**
    * @description

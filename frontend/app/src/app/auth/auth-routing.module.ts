@@ -1,15 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
-import { AuthGuard } from './auth.guard';
+import { DeleteComponent } from './delete/delete.component';
 
 const routes: Routes = [
   {
-    path:"login", component:LoginComponent
+    path: "login",
+    component: LoginComponent
   },
-  
-
-  
+  {
+    path: "delete",
+    component: DeleteComponent
+  }
 ];
 
 @NgModule({

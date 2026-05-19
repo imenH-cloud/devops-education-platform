@@ -1,40 +1,64 @@
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Student } from '../parent/parent';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export interface CreateStudentDto {
-  name: string;
+export interface Student {
+  id?: number;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string;
   parentId: number;
-  // Add other required fields
+  classroomId: number;
+  diagnosisType: string;
+  notes: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class StudentService {
+  private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/student`;
 
-  constructor(private http: HttpClient) {}
-
-  getAllStudents(): Observable<Student[]> {
+  getAll(): Observable<Student[]> {
     return this.http.get<Student[]>(this.apiUrl);
   }
 
-  getStudentById(id: number): Observable<Student> {
+  getAllStudents(): Observable<Student[]> {
+    return this.getAll();
+  }
+
+  getById(id: number): Observable<Student> {
     return this.http.get<Student>(`${this.apiUrl}/${id}`);
   }
 
-  createStudent(student: CreateStudentDto): Observable<Student> {
+  getStudentById(id: number): Observable<Student> {
+    return this.getById(id);
+  }
+
+  create(student: Student): Observable<Student> {
     return this.http.post<Student>(this.apiUrl, student);
   }
 
-  updateStudent(id: number, student: Partial<Student>): Observable<Student> {
-    return this.http.put<Student>(`${this.apiUrl}/${id}`, student);
+  createStudent(student: Student): Observable<Student> {
+    return this.create(student);
   }
 
-  deleteStudent(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  update(id: number, student: Student): Observable<Student> {
+    return this.http.patch<Student>(`${this.apiUrl}/${id}`, student);
+  }
+
+  updateStudent(id: number, student: Student): Observable<Student> {
+    return this.update(id, student);
+  }
+
+  delete(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  deleteStudent(id: number): Observable<any> {
+    return this.delete(id);
   }
 }
