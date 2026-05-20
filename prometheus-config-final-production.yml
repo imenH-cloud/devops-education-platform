@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'education-platform'
+    environment: 'production'
+
+rule_files:
+  - '/etc/prometheus/rules/alerts.yml'
+
+scrape_configs:
+  # Prometheus self-monitoring (ONLY - this works!)
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
