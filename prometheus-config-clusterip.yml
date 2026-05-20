@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'education-platform'
+    environment: 'production'
+
+rule_files:
+  - '/etc/prometheus/rules/alerts.yml'
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Education Services - Using ClusterIPs (internal Kubernetes DNS)
+  - job_name: 'education-services'
+    static_configs:
+      - targets:
+          - 'gateway-backend:3000'
+          - 'auth-service:3001'
+          - 'user-service:3002'
+          - 'activity-service:3003'
+          - 'parent-service:3004'
+          - 'student-service:3005'
+          - 'classroom-service:3006'
+          - 'teacher-service:3007'
+    metrics_path: '/metrics'
+    scheme: 'http'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance

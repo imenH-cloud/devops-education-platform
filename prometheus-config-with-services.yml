@@ -1,0 +1,35 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'education-platform'
+    environment: 'production'
+
+rule_files:
+  - '/etc/prometheus/rules/alerts.yml'
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Education Services - Direct scraping (all have /metrics on port 3000-3007)
+  - job_name: 'education-services'
+    static_configs:
+      - targets:
+          - 'gateway-backend-nodeport:3000'
+          - 'auth-service-nodeport:3001'
+          - 'user-service-nodeport:3002'
+          - 'activity-service-nodeport:3003'
+          - 'parent-service-nodeport:3004'
+          - 'student-service-nodeport:3005'
+          - 'classroom-service-nodeport:3006'
+          - 'teacher-service-nodeport:3007'
+    metrics_path: '/metrics'
+    scheme: 'http'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__scheme__]
+        target_label: scheme

@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "16"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"deployment.kubernetes.io/revision":"15"},"creationTimestamp":"2026-05-06T07:47:09Z","generation":15,"labels":{"app":"prometheus"},"name":"prometheus","namespace":"monitoring","resourceVersion":"1082132","uid":"b01b6b44-c702-4ab5-9b0d-c5fcd40dbeb3"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"prometheus"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-05-15T16:06:07+02:00"},"labels":{"app":"prometheus"}},"spec":{"containers":[{"args":["--config.file=/etc/prometheus/prometheus.yml","--storage.tsdb.path=/prometheus","--storage.tsdb.retention.time=15d"],"env":[{"name":"RELOAD_CONFIG"}],"image":"prom/prometheus:latest","imagePullPolicy":"Always","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/-/healthy","port":9090,"scheme":"HTTP"},"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"name":"prometheus","ports":[{"containerPort":9090,"name":"web","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/-/ready","port":9090,"scheme":"HTTP"},"initialDelaySeconds":10,"periodSeconds":5,"successThreshold":1,"timeoutSeconds":1},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/etc/prometheus","name":"config"},{"mountPath":"/etc/prometheus/rules","name":"alerts"},{"mountPath":"/prometheus","name":"storage"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"prometheus","serviceAccountName":"prometheus","terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"prometheus-config-final-production"},"name":"config"},{"configMap":{"defaultMode":420,"name":"prometheus-alerts"},"name":"alerts"},{"emptyDir":{},"name":"storage"}]}}},"status":{"availableReplicas":1,"conditions":[{"lastTransitionTime":"2026-05-06T07:49:12Z","lastUpdateTime":"2026-05-20T01:34:16Z","message":"ReplicaSet \"prometheus-5bc95c6966\" has successfully progressed.","reason":"NewReplicaSetAvailable","status":"True","type":"Progressing"},{"lastTransitionTime":"2026-05-20T07:51:11Z","lastUpdateTime":"2026-05-20T07:51:11Z","message":"Deployment has minimum availability.","reason":"MinimumReplicasAvailable","status":"True","type":"Available"}],"observedGeneration":15,"readyReplicas":1,"replicas":1,"updatedReplicas":1}}
+  creationTimestamp: "2026-05-06T07:47:09Z"
+  generation: 16
+  labels:
+    app: prometheus
+  name: prometheus
+  namespace: monitoring
+  resourceVersion: "1083382"
+  uid: b01b6b44-c702-4ab5-9b0d-c5fcd40dbeb3
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: prometheus
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-05-15T16:06:07+02:00"
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - args:
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --storage.tsdb.path=/prometheus
+        - --storage.tsdb.retention.time=15d
+        env:
+        - name: RELOAD_CONFIG
+        image: prom/prometheus:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /-/healthy
+            port: 9090
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: prometheus
+        ports:
+        - containerPort: 9090
+          name: web
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /-/ready
+            port: 9090
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/prometheus
+          name: config
+        - mountPath: /etc/prometheus/rules
+          name: alerts
+        - mountPath: /prometheus
+          name: storage
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: prometheus
+      serviceAccountName: prometheus
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: prometheus-config-services
+        name: config
+      - configMap:
+          defaultMode: 420
+          name: prometheus-alerts
+        name: alerts
+      - emptyDir: {}
+        name: storage
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-20T07:51:11Z"
+    lastUpdateTime: "2026-05-20T07:51:11Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2026-05-06T07:49:12Z"
+    lastUpdateTime: "2026-05-20T08:04:48Z"
+    message: ReplicaSet "prometheus-59f44cfdd9" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 16
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
