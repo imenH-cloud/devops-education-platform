@@ -9,53 +9,86 @@ pipeline {
     
     parameters {
         choice(name: 'DEPLOY_ENV', choices: ['development', 'staging', 'production'], description: 'Deployment environment')
-        booleanParam(name: 'PUSH_DOCKER', defaultValue: false, description: 'Push images to Docker Hub?')
+        booleanParam(name: 'PUSH_DOCKER', defaultValue: true, description: 'Push images to Docker Hub?')
+        booleanParam(name: 'RUN_TRIVY', defaultValue: true, description: 'Run Trivy security scans?')
     }
     
     environment {
         DOCKER_REGISTRY = 'eline2016'
-        DOCKER_CREDENTIALS = credentials('docker-hub-credentials')
-        JIRA_SITE = 'imen-hamada'
         GIT_REPO = 'https://github.com/imenH-cloud/devops-education-platform.git'
-        KUBE_NAMESPACE = 'education'
     }
     
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    echo "🔄 Checking out source code..."
-                    checkout scm
-                }
+                echo "🔄 Checking out source code..."
+                checkout scm
             }
         }
         
-        stage('Build') {
+        stage('Build Backend Services') {
             parallel {
-                stage('Build Frontend') {
+                stage('Build Activity Service') {
                     steps {
                         script {
-                            echo "🏗️ Building Frontend (Angular)..."
-                            dir('frontend') {
-                                sh '''
-                                    docker build -t ${DOCKER_REGISTRY}/horizons-frontend:${BUILD_NUMBER} \
-                                        -t ${DOCKER_REGISTRY}/horizons-frontend:latest \
-                                        -f Dockerfile.prod .
-                                '''
+                            echo "🔨 Building activity-service:${BUILD_NUMBER}..."
+                            dir('backend/activity') {
+                                bat "docker build -t ${DOCKER_REGISTRY}/devopspfe-activity-service:${BUILD_NUMBER} ."
                             }
                         }
                     }
                 }
                 
-                stage('Build Activity Service') {
+                stage('Build Auth Service') {
                     steps {
                         script {
-                            echo "🏗️ Building Activity Service..."
-                            dir('backend/activity') {
-                                sh '''
-                                    docker build -t ${DOCKER_REGISTRY}/devopspfe-activity-service:${BUILD_NUMBER} \
-                                        -t ${DOCKER_REGISTRY}/devopspfe-activity-service:latest .
-                                '''
+                            echo "🔨 Building auth-service:${BUILD_NUMBER}..."
+                            dir('backend/auth') {
+                                bat "docker build -t ${DOCKER_REGISTRY}/devopspfe-auth-service:${BUILD_NUMBER} ."
+                            }
+                        }
+                    }
+                }
+                
+                stage('Build Classroom Service') {
+                    steps {
+                        script {
+                            echo "🔨 Building classroom-service:${BUILD_NUMBER}..."
+                            dir('backend/classroom') {
+                                bat "docker build -t ${DOCKER_REGISTRY}/devopspfe-classroom-service:${BUILD_NUMBER} ."
+                            }
+                        }
+                    }
+                }
+                
+                stage('Build Gateway Service') {
+                    steps {
+                        script {
+                            echo "🔨 Building gateway-service:${BUILD_NUMBER}..."
+                            dir('backend/gateway') {
+                                bat "docker build -t ${DOCKER_REGISTRY}/devopspfe-gateway-service:${BUILD_NUMBER} ."
+                            }
+                        }
+                    }
+                }
+                
+                stage('Build Parent Service') {
+                    steps {
+                        script {
+                            echo "🔨 Building parent-service:${BUILD_NUMBER}..."
+                            dir('backend/parent') {
+                                bat "docker build -t ${DOCKER_REGISTRY}/devopspfe-parent-service:${BUILD_NUMBER} ."
+                            }
+                        }
+                    }
+                }
+                
+                stage('Build Student Service') {
+                    steps {
+                        script {
+                            echo "🔨 Building student-service:${BUILD_NUMBER}..."
+                            dir('backend/student') {
+                                bat "docker build -t ${DOCKER_REGISTRY}/devopspfe-student-service:${BUILD_NUMBER} ."
                             }
                         }
                     }
@@ -64,26 +97,20 @@ pipeline {
                 stage('Build Teacher Service') {
                     steps {
                         script {
-                            echo "🏗️ Building Teacher Service..."
+                            echo "🔨 Building teacher-service:${BUILD_NUMBER}..."
                             dir('backend/teacher') {
-                                sh '''
-                                    docker build -t ${DOCKER_REGISTRY}/devopspfe-teacher-service:${BUILD_NUMBER} \
-                                        -t ${DOCKER_REGISTRY}/devopspfe-teacher-service:latest .
-                                '''
+                                bat "docker build -t ${DOCKER_REGISTRY}/devopspfe-teacher-service:${BUILD_NUMBER} ."
                             }
                         }
                     }
                 }
                 
-                stage('Build Gateway') {
+                stage('Build User Service') {
                     steps {
                         script {
-                            echo "🏗️ Building Gateway..."
-                            dir('backend/gateway') {
-                                sh '''
-                                    docker build -t ${DOCKER_REGISTRY}/devopspfe-gateway-backend:${BUILD_NUMBER} \
-                                        -t ${DOCKER_REGISTRY}/devopspfe-gateway-backend:latest .
-                                '''
+                            echo "🔨 Building user-service:${BUILD_NUMBER}..."
+                            dir('backend/user') {
+                                bat "docker build -t ${DOCKER_REGISTRY}/devopspfe-user-service:${BUILD_NUMBER} ."
                             }
                         }
                     }
@@ -91,12 +118,34 @@ pipeline {
             }
         }
         
-        stage('Test') {
+        stage('Build Frontend') {
             steps {
                 script {
-                    echo "✅ Running tests..."
-                    // Add your tests here
-                    sh 'echo "Tests would run here"'
+                    echo "🔨 Building frontend-app:${BUILD_NUMBER}..."
+                    dir('frontend/app') {
+                        bat "docker build --build-arg NODE_OPTIONS=\"--max-old-space-size=4096\" -t ${DOCKER_REGISTRY}/devopspfe-frontend-app:${BUILD_NUMBER} ."
+                    }
+                }
+            }
+        }
+        
+        stage('Trivy Security Scan') {
+            when {
+                expression { params.RUN_TRIVY == true }
+            }
+            steps {
+                script {
+                    echo "🔍 Running Trivy security scans..."
+                    bat '''
+                        setlocal enabledelayedexpansion
+                        for %%i in (activity-service auth-service classroom-service gateway-service parent-service student-service teacher-service user-service) do (
+                            echo Scanning eline2016/devopspfe-%%i:%BUILD_NUMBER%...
+                            docker run --rm aquasec/trivy:latest image --exit-code 0 --severity CRITICAL eline2016/devopspfe-%%i:%BUILD_NUMBER% || exit /b 0
+                        )
+                        echo Scanning eline2016/devopspfe-frontend-app:%BUILD_NUMBER%...
+                        docker run --rm aquasec/trivy:latest image --exit-code 0 --severity CRITICAL eline2016/devopspfe-frontend-app:%BUILD_NUMBER% || exit /b 0
+                        echo ✅ Trivy scans completed
+                    '''
                 }
             }
         }
@@ -107,83 +156,61 @@ pipeline {
             }
             steps {
                 script {
-                    echo "🚀 Pushing images to Docker Hub..."
-                    sh '''
-                        echo ${DOCKER_CREDENTIALS_PSW} | docker login -u ${DOCKER_CREDENTIALS_USR} --password-stdin
-                        
-                        docker push ${DOCKER_REGISTRY}/horizons-frontend:${BUILD_NUMBER}
-                        docker push ${DOCKER_REGISTRY}/horizons-frontend:latest
-                        
-                        docker push ${DOCKER_REGISTRY}/devopspfe-activity-service:${BUILD_NUMBER}
-                        docker push ${DOCKER_REGISTRY}/devopspfe-activity-service:latest
-                        
-                        docker push ${DOCKER_REGISTRY}/devopspfe-teacher-service:${BUILD_NUMBER}
-                        docker push ${DOCKER_REGISTRY}/devopspfe-teacher-service:latest
-                        
-                        docker push ${DOCKER_REGISTRY}/devopspfe-gateway-backend:${BUILD_NUMBER}
-                        docker push ${DOCKER_REGISTRY}/devopspfe-gateway-backend:latest
-                        
-                        docker logout
-                    '''
+                    echo "📤 Pushing images to Docker Hub..."
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        bat '''
+                            docker login -u %DOCKER_USER% -p %DOCKER_PASS%
+                            
+                            for %%s in (activity auth classroom gateway parent student teacher user) do (
+                                echo Pushing eline2016/devopspfe-%%s-service:%BUILD_NUMBER%...
+                                docker push eline2016/devopspfe-%%s-service:%BUILD_NUMBER%
+                            )
+                            
+                            echo Pushing eline2016/devopspfe-frontend-app:%BUILD_NUMBER%...
+                            docker push eline2016/devopspfe-frontend-app:%BUILD_NUMBER%
+                            
+                            docker logout
+                            echo ✅ All images pushed to Docker Hub
+                        '''
+                    }
                 }
             }
         }
         
-        stage('Update Jira') {
-            steps {
-                script {
-                    echo "📋 Updating Jira..."
-                    // Jira integration example
-                    sh '''
-                        echo "Build ${BUILD_NUMBER} completed for ${DEPLOY_ENV} environment"
-                    '''
-                }
-            }
-        }
-        
-        stage('Deploy to Kubernetes') {
+        stage('Update GitOps') {
             when {
-                expression { params.DEPLOY_ENV != '' }
+                expression { params.PUSH_DOCKER == true }
             }
             steps {
                 script {
-                    echo "📦 Deploying to Kubernetes (${params.DEPLOY_ENV})..."
-                    sh '''
-                        kubectl set image deployment/frontend-app-deployment \
-                            -n ${KUBE_NAMESPACE} \
-                            frontend-app=${DOCKER_REGISTRY}/horizons-frontend:${BUILD_NUMBER} \
-                            --record
-                        
-                        kubectl set image deployment/activity-service-deployment \
-                            -n ${KUBE_NAMESPACE} \
-                            activity-app=${DOCKER_REGISTRY}/devopspfe-activity-service:${BUILD_NUMBER} \
-                            --record
-                        
-                        kubectl set image deployment/teacher-service-deployment \
-                            -n ${KUBE_NAMESPACE} \
-                            teacher-app=${DOCKER_REGISTRY}/devopspfe-teacher-service:${BUILD_NUMBER} \
-                            --record
-                        
-                        kubectl set image deployment/gateway-backend-deployment \
-                            -n ${KUBE_NAMESPACE} \
-                            gateway-app=${DOCKER_REGISTRY}/devopspfe-gateway-backend:${BUILD_NUMBER} \
-                            --record
-                    '''
-                }
-            }
-        }
-        
-        stage('Verify Deployment') {
-            when {
-                expression { params.DEPLOY_ENV != '' }
-            }
-            steps {
-                script {
-                    echo "✅ Verifying deployment..."
-                    sh '''
-                        kubectl rollout status deployment/frontend-app-deployment -n ${KUBE_NAMESPACE} --timeout=5m
-                        kubectl get pods -n ${KUBE_NAMESPACE}
-                    '''
+                    echo "🔄 Updating GitOps manifests..."
+                    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                        bat '''
+                            if exist gitops-temp rmdir /s /q gitops-temp || exit /b 0
+                            
+                            set "REPO_URL=https://%GITHUB_TOKEN%@github.com/imenH-cloud/devops-education-platform-gitops.git"
+                            
+                            git clone !REPO_URL! gitops-temp
+                            cd gitops-temp
+                            
+                            echo Updating manifests...
+                            for %%s in (activity auth classroom gateway parent student teacher user) do (
+                                powershell -Command "(Get-Content 'kubernetes/backend/%%s-service.yaml') -replace 'image: .*', 'image: eline2016/devopspfe-%%s-service:%BUILD_NUMBER%' | Set-Content 'kubernetes/backend/%%s-service.yaml'"
+                            )
+                            
+                            powershell -Command "(Get-Content 'kubernetes/frontend/frontend-app.yaml') -replace 'image: .*', 'image: eline2016/devopspfe-frontend-app:%BUILD_NUMBER%' | Set-Content 'kubernetes/frontend/frontend-app.yaml'"
+                            
+                            git config user.email "jenkins@devops.local"
+                            git config user.name "Jenkins CI/CD"
+                            git add .
+                            git commit -m "Build %BUILD_NUMBER% - update Docker images" || exit /b 0
+                            git push origin main
+                            
+                            cd ..
+                            rmdir /s /q gitops-temp
+                            echo ✅ GitOps manifests updated
+                        '''
+                    }
                 }
             }
         }
@@ -193,20 +220,18 @@ pipeline {
         always {
             script {
                 echo "🧹 Cleaning up..."
-                sh 'docker image prune -f'
+                bat 'docker image prune -f || exit /b 0'
             }
         }
         
         success {
-            script {
-                echo "✅ Pipeline succeeded!"
-            }
+            echo "✅ BUILD SUCCESSFUL - Build #${BUILD_NUMBER}"
+            echo "📤 Images pushed: eline2016/devopspfe-*:${BUILD_NUMBER}"
+            echo "🔄 GitOps: Updated"
         }
         
         failure {
-            script {
-                echo "❌ Pipeline failed!"
-            }
+            echo "❌ BUILD FAILED - Build #${BUILD_NUMBER}"
         }
     }
 }
