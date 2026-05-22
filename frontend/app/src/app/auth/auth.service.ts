@@ -13,11 +13,20 @@ export default class AuthService {
   private platformId = inject(PLATFORM_ID);
 
   loginUser(login: Login): Observable<any> {
-    // URL relative : sera proxifiée par nginx vers auth-service:3001
     const url = '/auth/login';
     console.log('Login URL:', url);
     console.log('Login payload:', login);
-    return this.http.post<any>(url, login);
+    
+    // Convert to form-urlencoded instead of JSON
+    const formData = new URLSearchParams();
+    formData.append('email', login.email);
+    formData.append('password', login.password);
+    
+    return this.http.post<any>(url, formData.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
   }
 }
 

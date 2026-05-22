@@ -10,6 +10,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() authUserDto: AuthUserDto) {
     console.log("authUserDto",authUserDto)
+    console.log("Request headers and body type:", typeof authUserDto)
+    if(!authUserDto.email || !authUserDto.password) {
+      console.error('Missing email or password:', {email: authUserDto.email, password: authUserDto.password})
+      return { error: 'Missing credentials', received: authUserDto };
+    }
     return this.authService.login(authUserDto);
   }
 
