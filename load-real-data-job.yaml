@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-real-data
+  namespace: education
+spec:
+  template:
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: postgres-init
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          psql -h postgres-db -U postgres -d education_db << 'SQLEOF'
+          -- CLEAR OLD DATA
+          DELETE FROM student;
+          DELETE FROM parent;
+          
+          -- INSERT PARENTS FROM YOUR SCREENSHOTS
+          INSERT INTO parent (id, "firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) VALUES 
+          (1, 'nadia', 'el heni', 'nadia11@gmail.com', '90990900', 7654312, 'chebbia tozeur', 'CNSS', '175432', 'infirmiere'),
+          (2, 'chadha', 'khaldi', 'chadha1@gmail.com', '90878654', 7654567, 'chebbia tozeur', 'CNRPS', '1723456', 'enseignante'),
+          (3, 'ALI', 'BELDI', 'alibeldi@gmail.com', '20654234', 7345623, 'ras tabya tozeu', 'CNSS', '172345', 'COMMERCANT'),
+          (4, 'zahra', 'kaddouri', 'zahra@gmail.com', '99999999', 8453423, 'Degache', 'CNRPS', '999999', 'femme de menage');
+          
+          -- INSERT STUDENTS FROM YOUR SCREENSHOTS
+          INSERT INTO student (id, "firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "isActive", "enrollmentDate", "parentId", "classroomId") VALUES 
+          (2, 'sayed', 'INS002', 'el heni', 'sayed1@gmail.com', '2015-01-01', '90767678', 'Degache', true, '2024-09-01', 1, 1),
+          (3, 'Mohamed', 'INS003', 'yazid jhimi', 'yazid@gmail.com', '2014-01-01', '23098335', 'Tozeur', true, '2024-09-01', 2, 2),
+          (4, 'yassine', 'INS004', 'beldi', 'yassine@gmail.com', '2013-01-01', '20345654', 'Tozeur', true, '2024-09-01', 3, 1),
+          (5, 'abderrazak', 'INS005', 'mahmoud', 'abdou@gmail.com', '2012-01-01', '99999999', 'Degache', true, '2024-09-01', 4, 2);
+          
+          SELECT 'Data Loaded!' as status;
+          SELECT COUNT(*) as Parents FROM parent;
+          SELECT COUNT(*) as Students FROM student;
+          SQLEOF
+      restartPolicy: Never
+  backoffLimit: 1
