@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: add-missing-parents
+  namespace: education
+spec:
+  template:
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: postgres-init
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          psql -h postgres-db -U postgres -d education_db << 'SQLEOF'
+          INSERT INTO parent ("firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) 
+          VALUES ('Michel', 'Durand', 'michel@email.com', '0634567890', 34567890, '25 boulevard', 'Mutuelle', 'MUT345', 'Medecin');
+          
+          INSERT INTO parent ("firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) 
+          VALUES ('Isabelle', 'Petit', 'isabelle@email.com', '0645678901', 45678901, '12 place', 'SS', 'SS456', 'Avocate');
+          
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "isActive", "enrollmentDate", "parentId", "classroomId") 
+          VALUES 
+          ('Thomas', 'INS003', 'Bernard', 'thomas@student.com', '2011-03-10', '0623', '8 avenue', true, '2024-09-01', 2, 2),
+          ('Julie', 'INS004', 'Bernard', 'julie@student.com', '2013-11-30', '0624', '8 avenue', true, '2024-09-01', 2, 2),
+          ('Camille', 'INS005', 'Durand', 'camille@student.com', '2010-09-12', '0634', '25 blvd', true, '2024-09-01', 3, 3),
+          ('Nathan', 'INS006', 'Durand', 'nathan@student.com', '2015-01-25', '0635', '25 blvd', true, '2024-09-01', 3, 3),
+          ('Chloe', 'INS007', 'Petit', 'chloe@student.com', '2012-07-18', '0645', '12 place', true, '2024-09-01', 4, 1);
+          
+          INSERT INTO activity (name, type, description, location, date, duration, classroom) 
+          VALUES 
+          ('Sensibilisation', 'other', 'Textures et sons', 'Salle1', NOW(), 45, 1),
+          ('Jeu social', 'club', 'Interactions', 'Salle2', NOW(), 60, 2),
+          ('Yoga', 'sports', 'Respiration', 'Salle3', NOW(), 30, 1),
+          ('Communication', 'club', 'Emotions', 'Salle4', NOW(), 45, 3),
+          ('Puzzle', 'academic', 'Logique', 'Salle5', NOW(), 30, 1),
+          ('PECS', 'other', 'Pictogrammes', 'Salle6', NOW(), 45, 3),
+          ('Musique', 'cultural', 'Instruments', 'Salle7', NOW(), 45, 2),
+          ('Dessin', 'cultural', 'Art', 'Salle8', NOW(), 40, 2),
+          ('Motricite', 'sports', 'Parcours', 'Salle9', NOW(), 50, 2),
+          ('Ballon', 'sports', 'Coordination', 'Salle10', NOW(), 35, 2);
+          
+          SELECT 'Data loaded successfully!' as message;
+          SELECT COUNT(*) as Teachers FROM teacher UNION ALL
+          SELECT COUNT(*) FROM parent UNION ALL
+          SELECT COUNT(*) FROM student UNION ALL
+          SELECT COUNT(*) FROM classroom UNION ALL
+          SELECT COUNT(*) FROM activity;
+          SQLEOF
+      restartPolicy: Never
+  backoffLimit: 1

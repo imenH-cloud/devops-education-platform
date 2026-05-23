@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-final-data
+  namespace: education
+spec:
+  template:
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: postgres-init
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          psql -h postgres-db -U postgres -d education_db << 'SQLEOF'
+          -- ADD MORE STUDENTS (avoiding ID duplicates)
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "isActive", "enrollmentDate", "parentId", "classroomId") 
+          VALUES 
+          ('Thomas', 'INS003', 'Bernard', 'thomas.bernard@student.com', '2011-03-10', '0623456789', '8 avenue de la Republique', true, '2024-09-01', 2, 2),
+          ('Julie', 'INS004', 'Bernard', 'julie.bernard@student.com', '2013-11-30', '0623456790', '8 avenue de la Republique', true, '2024-09-01', 2, 2),
+          ('Camille', 'INS005', 'Durand', 'camille.durand@student.com', '2010-09-12', '0634567890', '25 boulevard Victor Hugo', true, '2024-09-01', 3, 3),
+          ('Nathan', 'INS006', 'Durand', 'nathan.durand@student.com', '2015-01-25', '0634567891', '25 boulevard Victor Hugo', true, '2024-09-01', 3, 3),
+          ('Chloe', 'INS007', 'Petit', 'chloe.petit@student.com', '2012-07-18', '0645678901', '12 place de la Liberte', true, '2024-09-01', 4, 1);
+          
+          -- ACTIVITIES (using correct column name 'classroom')
+          INSERT INTO activity (name, type, description, location, date, duration, classroom) 
+          VALUES 
+          ('Sensibilisation sensorielle', 'other', 'Exploration des textures et sons', 'Salle sensorielle', NOW(), 45, 1),
+          ('Jeu de role social', 'club', 'Apprentissage des interactions sociales', 'Salle de jeux', NOW(), 60, 2),
+          ('Relaxation Yoga', 'sports', 'Exercices de respiration et postures', 'Salle calme', NOW(), 30, 1),
+          ('Atelier de communication', 'club', 'Apprentissage des emotions', 'Salle de classe', NOW(), 45, 3),
+          ('Puzzle et logique', 'academic', 'Developpement de la logique', 'Salle de classe', NOW(), 30, 1),
+          ('Communication PECS', 'other', 'Pictogrammes pour communication', 'Salle de classe', NOW(), 45, 3),
+          ('Musique et rythme', 'cultural', 'Exploration des instruments', 'Salle de musique', NOW(), 45, 2),
+          ('Atelier dessin', 'cultural', 'Expression artistique libre', 'Salle art', NOW(), 40, 2),
+          ('Parcours moteur', 'sports', 'Parcours obstacles pour motricite', 'Gymnase', NOW(), 50, 2),
+          ('Jeux de ballon', 'sports', 'Activites de coordination', 'Cour recreation', NOW(), 35, 2);
+          
+          -- FINAL COUNT
+          SELECT '✅ FINAL DATA COUNT:' as status;
+          SELECT COUNT(*) as Teachers FROM teacher;
+          SELECT COUNT(*) as Parents FROM parent;
+          SELECT COUNT(*) as Classrooms FROM classroom;
+          SELECT COUNT(*) as Students FROM student;
+          SELECT COUNT(*) as Activities FROM activity;
+          SQLEOF
+      restartPolicy: Never
+  backoffLimit: 1

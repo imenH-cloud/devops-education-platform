@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-teachers-data
+  namespace: education
+spec:
+  template:
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: postgres-init
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          psql -h postgres-db -U postgres -d education_db << 'SQLEOF'
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, password, specialization, "profileImage", "dateOfMandate") 
+          VALUES ('TCH001', '12345678', 'Imen', 'Hamada', 'F', 'Tozeur', '01234567', 'imen.hamada@school.com', 'password123', 'Mathematiques', 'default.jpg', NOW());
+          
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, password, specialization, "profileImage", "dateOfMandate") 
+          VALUES ('TCH002', '87654321', 'Marie', 'Curie', 'F', 'Paris', '01234568', 'marie.curie@school.com', 'password123', 'Physique', 'default.jpg', NOW());
+          
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, password, specialization, "profileImage", "dateOfMandate") 
+          VALUES ('TCH003', '98765432', 'Albert', 'Einstein', 'M', 'Berlin', '01234569', 'albert.einstein@school.com', 'password123', 'Physique', 'default.jpg', NOW());
+          
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, password, specialization, "profileImage", "dateOfMandate") 
+          VALUES ('TCH004', '11223344', 'Ada', 'Lovelace', 'F', 'Londres', '01234570', 'ada.lovelace@school.com', 'password123', 'Informatique', 'default.jpg', NOW());
+          
+          SELECT 'Teachers Inserted:' as status, COUNT(*) FROM teacher;
+          SQLEOF
+      restartPolicy: Never
+  backoffLimit: 1
