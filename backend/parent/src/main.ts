@@ -1,16 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable global validation
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
+
   // Swagger config
   const config = new DocumentBuilder()
-    .setTitle('Education Platform Gateway')
-    .setDescription('Gateway API for the Education platform')
+    .setTitle('Parent Service')
+    .setDescription('API pour la gestion des parents')
     .setVersion('1.0')
-    .addTag('gateway')
+    .addTag('parents')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
