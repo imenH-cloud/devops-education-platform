@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-initial-data
+  namespace: education
+spec:
+  template:
+    spec:
+      containers:
+      - name: postgres-loader
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: postgres
+        command:
+        - sh
+        - -c
+        - |
+          sleep 5
+          psql -h postgres-deployment-b7b558d55-np77g -U postgres -d education_db << 'EOF'
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, specialization) VALUES ('TCH001', 12345678, 'Imen', 'Hamada', 'F', 'Tozeur', '01234567', 'imen.hamada@school.com', 'Mathematiques');
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, specialization) VALUES ('TCH002', 87654321, 'Marie', 'Curie', 'F', 'Paris', '01234568', 'marie.curie@school.com', 'Physique');
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, specialization) VALUES ('TCH003', 98765432, 'Albert', 'Einstein', 'M', 'Berlin', '01234569', 'albert.einstein@school.com', 'Physique');
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, specialization) VALUES ('TCH004', 11223344, 'Ada', 'Lovelace', 'F', 'Londres', '01234570', 'ada.lovelace@school.com', 'Informatique');
+          INSERT INTO parent ("firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) VALUES ('Jean', 'Martin', 'jean.martin@email.com', '0612345678', 12345678, '15 rue des Ecoles', 'Mutuelle', 'MUT123456', 'Ingenieur');
+          INSERT INTO parent ("firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) VALUES ('Sophie', 'Bernard', 'sophie.bernard@email.com', '0623456789', 23456789, '8 avenue Republique', 'Securite Sociale', 'SS234567', 'Enseignante');
+          INSERT INTO parent ("firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) VALUES ('Michel', 'Durand', 'michel.durand@email.com', '0634567890', 34567890, '25 boulevard Hugo', 'Mutuelle', 'MUT345678', 'Medecin');
+          INSERT INTO parent ("firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) VALUES ('Isabelle', 'Petit', 'isabelle.petit@email.com', '0645678901', 45678901, '12 place Liberte', 'Securite Sociale', 'SS456789', 'Avocate');
+          INSERT INTO classroom (name, capacity, grade, "academicYear", location, "Specialization") VALUES ('Classe A - TPS', 15, 'TPS', '2024-2025', 'Batiment A', 'Petite Section');
+          INSERT INTO classroom (name, capacity, grade, "academicYear", location, "Specialization") VALUES ('Classe B - PS', 16, 'PS', '2024-2025', 'Batiment B', 'Petite Section');
+          INSERT INTO classroom (name, capacity, grade, "academicYear", location, "Specialization") VALUES ('Classe C - MS', 18, 'MS', '2024-2025', 'Batiment C', 'Moyenne Section');
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") VALUES ('Lucas', 'INS001', 'Martin', 'lucas.martin@student.com', '2012-05-15', '0612345678', '15 rue des Ecoles', '2024-09-01', 1, 1);
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") VALUES ('Emma', 'INS002', 'Martin', 'emma.martin@student.com', '2014-08-22', '0612345679', '15 rue des Ecoles', '2024-09-01', 1, 1);
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") VALUES ('Thomas', 'INS003', 'Bernard', 'thomas.bernard@student.com', '2011-03-10', '0623456789', '8 avenue Republique', '2024-09-01', 2, 2);
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") VALUES ('Julie', 'INS004', 'Bernard', 'julie.bernard@student.com', '2013-11-30', '0623456790', '8 avenue Republique', '2024-09-01', 2, 2);
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") VALUES ('Camille', 'INS005', 'Durand', 'camille.durand@student.com', '2010-09-12', '0634567890', '25 boulevard Hugo', '2024-09-01', 3, 3);
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") VALUES ('Nathan', 'INS006', 'Durand', 'nathan.durand@student.com', '2015-01-25', '0634567891', '25 boulevard Hugo', '2024-09-01', 3, 3);
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") VALUES ('Chloe', 'INS007', 'Petit', 'chloe.petit@student.com', '2012-07-18', '0645678901', '12 place Liberte', '2024-09-01', 4, 1);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Sensibilisation sensorielle', 'Salle sensorielle', '2026-05-25 10:00:00', 1);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Jeu de role social', 'Salle de jeux', '2026-05-26 14:00:00', 2);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Relaxation Yoga', 'Salle calme', '2026-05-27 09:00:00', 1);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Atelier communication', 'Salle de classe', '2026-05-28 15:00:00', 3);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Puzzle et logique', 'Salle de classe', '2026-05-29 11:00:00', 1);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Communication PECS', 'Salle de classe', '2026-05-30 10:30:00', 3);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Musique et rythme', 'Salle de musique', '2026-05-31 14:30:00', 2);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Atelier dessin', 'Salle art', '2026-06-01 13:00:00', 2);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Parcours moteur', 'Gymnase', '2026-06-02 10:00:00', 2);
+          INSERT INTO activity (name, location, date, classroom) VALUES ('Jeux de ballon', 'Cour recreation', '2026-06-03 15:30:00', 2);
+          EOF
+          echo "Data load complete"
+      restartPolicy: Never
+  backoffLimit: 3
