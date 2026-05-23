@@ -1,0 +1,43 @@
+# .gitignore - GitOps Repository
+
+# Secrets (never commit)
+*secret*
+*password*
+*.key
+*.pem
+.env
+
+# Sensitive data
+sealed-secrets/
+secrets/
+
+# Temporary files
+*.tmp
+.tmp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Local overrides
+overlays/local/
+local-values.yaml
+
+# Don't commit generated files
+*~.yaml
+*.generated.yaml

@@ -18,10 +18,11 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // Gateway écoute sur 3000
-  await app.listen(3004, '0.0.0.0');
+  // Parent service écoute sur 3005
+  const port = process.env.PORT || 3005;
+  await app.listen(port, '0.0.0.0');
 
-  console.log(`Gateway is running at http://localhost:3004`);
-  console.log(`Swagger is available at http://localhost:3004/api`);
+  console.log(`Parent Service is running at http://localhost:${port}`);
+  console.log(`Swagger is available at http://localhost:${port}/api`);
 }
 bootstrap();

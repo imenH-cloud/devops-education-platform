@@ -19,9 +19,9 @@ async function bootstrap() {
   app.enableCors();
 
   // Gateway écoute sur 3000
-  await app.listen(3006, '0.0.0.0');
+  await app.listen(3004, '0.0.0.0');
 
-  console.log(`Gateway is running at http://localhost:3006`);
-  console.log(`Swagger is available at http://localhost:3006/api`);
+  console.log(`Classroom Service is running at http://localhost:3004`);
+  console.log(`Swagger is available at http://localhost:3004/api`);
 }
 bootstrap();

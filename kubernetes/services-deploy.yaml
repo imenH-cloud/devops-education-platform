@@ -1,0 +1,167 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+      - name: auth-service
+        image: eline2016/devopspfe-auth-service:58
+        ports:
+        - containerPort: 3001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - name: user-service
+        image: eline2016/devopspfe-user-service:58
+        ports:
+        - containerPort: 3002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activity-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: activity-service
+  template:
+    metadata:
+      labels:
+        app: activity-service
+    spec:
+      containers:
+      - name: activity-service
+        image: eline2016/devopspfe-activity-service:58
+        ports:
+        - containerPort: 3003
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parent-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parent-service
+  template:
+    metadata:
+      labels:
+        app: parent-service
+    spec:
+      containers:
+      - name: parent-service
+        image: eline2016/devopspfe-parent-service:58
+        ports:
+        - containerPort: 3004
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-service
+  template:
+    metadata:
+      labels:
+        app: student-service
+    spec:
+      containers:
+      - name: student-service
+        image: eline2016/devopspfe-student-service:58
+        ports:
+        - containerPort: 3005
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: classroom-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: classroom-service
+  template:
+    metadata:
+      labels:
+        app: classroom-service
+    spec:
+      containers:
+      - name: classroom-service
+        image: eline2016/devopspfe-classroom-service:58
+        ports:
+        - containerPort: 3006
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teacher-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: teacher-service
+  template:
+    metadata:
+      labels:
+        app: teacher-service
+    spec:
+      containers:
+      - name: teacher-service
+        image: eline2016/devopspfe-teacher-service:58
+        ports:
+        - containerPort: 3007
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+      - name: gateway-service
+        image: eline2016/devopspfe-gateway-service:58
+        ports:
+        - containerPort: 3000

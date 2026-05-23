@@ -1,0 +1,67 @@
+# .gitignore - Source Code Repository
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+dist/
+build/
+
+# TypeScript
+*.tsbuildinfo
+*.js.map
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Kubernetes (keep locally, don't push)
+kubernetes/
+k8s/
+
+# Secrets
+secrets/
+*.key
+*.pem
+*.pfx
+.ssh/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Docker
+Dockerfile.dev
+docker-compose.override.yml
+
+# Testing
+coverage/
+.nyc_output/
+
+# Dependencies
+yarn.lock (if not needed)
+
+# Misc
+*.orig
+.history/

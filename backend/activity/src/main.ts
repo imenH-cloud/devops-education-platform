@@ -1,9 +1,14 @@
-﻿import { NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { initializeDatabase } from './database/init';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Initialize database before app startup
+  const dataSource = app.get('DataSource');
+  await initializeDatabase(dataSource);
 
   const config = new DocumentBuilder()
     .setTitle('Activity Service')

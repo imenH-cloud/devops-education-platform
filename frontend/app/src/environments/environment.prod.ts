@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
+  production: true,
   apiUrl: 'http://localhost:31000'  // Gateway sur port 31000
 };

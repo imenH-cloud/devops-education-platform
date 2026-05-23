@@ -1,0 +1,65 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-production-data
+  namespace: education
+spec:
+  template:
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: postgres-client
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        - name: DB_HOST
+          value: "postgres-db"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_NAME
+          value: "education_db"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for database to be ready..."
+          sleep 5
+          echo "Loading production data..."
+          psql -h $DB_HOST -U $DB_USER -d $DB_NAME << 'EOF'
+          -- Disable constraints temporarily
+          ALTER TABLE student DISABLE TRIGGER ALL;
+          ALTER TABLE activity DISABLE TRIGGER ALL;
+          
+          -- PARENTS
+          INSERT INTO parent (id, "firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) VALUES 
+          (1, 'Ahmed', 'Ben Salah', 'ahmed.bensalah@example.com', '22112233', 12345678, 'Rue de Tunis, Ariana', 'CNAM', 'INS123456789', 'Enseignant');
+          
+          INSERT INTO parent (id, "firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) VALUES
+          (2, 'houda', 'rouissi', 'houdaR@gmail.com', '50987654', 7564534, 'TOZEUR', 'CNAM', '887654345678', 'enseignant');
+          
+          -- CLASSROOM
+          INSERT INTO classroom (id, name, capacity, grade, "academicYear", "isActive", location, "Specialization") VALUES
+          (1, 'educationSpecial', 8, '1', '2024-2025', true, 'classe1', 'autisme');
+          
+          -- STUDENTS
+          INSERT INTO student (id, "firstName", "numeroInscriptio", "lastName", email, "phoneNumber", address, "isActive", "parentId", "classroomId", "dateOfBirth", "enrollmentDate") VALUES
+          (1, 'nada', 'STU001', 'salhi', 'nada.salhi@student.com', '9054534343', 'hammet jarid', true, 2, 1, '2025-06-02', '2025-06-03');
+          
+          -- ACTIVITIES  
+          INSERT INTO activity (id, name, type, description, location, date, duration, "isCompleted", metadata, "classroomId") VALUES
+          (1, 'orthophonie', 'academic', 'seances d''orthophonie', 'utaim', '2025-06-10 00:00:00', 14, true, '{"resources":[""],"attachments":[""],"comments":""}', 1);
+          
+          -- Re-enable constraints
+          ALTER TABLE student ENABLE TRIGGER ALL;
+          ALTER TABLE activity ENABLE TRIGGER ALL;
+          
+          -- Verify
+          SELECT 'Parents:' as table_name, COUNT(*) FROM parent;
+          SELECT 'Classrooms:' as table_name, COUNT(*) FROM classroom;
+          SELECT 'Students:' as table_name, COUNT(*) FROM student;
+          SELECT 'Activities:' as table_name, COUNT(*) FROM activity;
+          EOF
+          echo "Data loading completed!"
+      restartPolicy: Never
+  backoffLimit: 3

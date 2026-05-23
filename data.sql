@@ -1,0 +1,15 @@
+INSERT INTO parent (firstName, lastName, email, phoneNumber, NCIN, address, typeInsurance, Numeroinsurance, job) VALUES ('Ahmed', 'Ben Ali', 'ahmed@email.com', '21612345678', 12345678, '123', 'CNSS', 'C1', 'Eng');
+INSERT INTO parent (firstName, lastName, email, phoneNumber, NCIN, address, typeInsurance, Numeroinsurance, job) VALUES ('Fatima', 'Khalil', 'fatima@email.com', '21698765432', 87654321, '456', 'CNAM', 'C2', 'Doctor');
+INSERT INTO classroom (name, capacity, grade, academicYear) VALUES ('Classe A', 25, 'L1', '2025-2026');
+INSERT INTO classroom (name, capacity, grade, academicYear) VALUES ('Classe B', 30, 'L2', '2025-2026');
+INSERT INTO student (firstName, numeroInscriptio, lastName, email, dateOfBirth, phoneNumber, address, enrollmentDate, parentId, classroomId) VALUES ('Karim', 'S001', 'Ben Ali', 'karim@school.com', '2016-01-15', '123', 'rue', '2025-09-01', 1, 1);
+INSERT INTO student (firstName, numeroInscriptio, lastName, email, dateOfBirth, phoneNumber, address, enrollmentDate, parentId, classroomId) VALUES ('Noor', 'S002', 'Khalil', 'noor@school.com', '2015-06-20', '456', 'ave', '2025-09-01', 2, 1);
+INSERT INTO teacher (indexNumber, cin, firstName, surname, gender, address, telephone, email, specialization) VALUES ('T001', 1111111, 'Rania', 'Ghorbel', 'F', 'rue', '123', 'rania@school.com', 'Math');
+INSERT INTO teacher (indexNumber, cin, firstName, surname, gender, address, telephone, email, specialization) VALUES ('T002', 2222222, 'Hassan', 'Maamouri', 'M', 'ave', '456', 'hassan@school.com', 'French');
+INSERT INTO activity (name, location, date, classroom) VALUES ('Math Lesson', 'ClasseA', '2026-05-25', 1);
+INSERT INTO activity (name, location, date, classroom) VALUES ('Science Activity', 'Lab', '2026-05-26', 2);
+SELECT COUNT(*) as total_parents FROM parent;
+SELECT COUNT(*) as total_students FROM student;
+SELECT COUNT(*) as total_classrooms FROM classroom;
+SELECT COUNT(*) as total_teachers FROM teacher;
+SELECT COUNT(*) as total_activities FROM activity;

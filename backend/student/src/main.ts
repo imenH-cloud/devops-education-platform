@@ -16,8 +16,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   app.enableCors();
-  await app.listen(3005, '0.0.0.0');
-  console.log(`Gateway is running at http://localhost:3005`);
-  console.log(`Swagger is available at http://localhost:3005/api`);
+  await app.listen(3006, '0.0.0.0');
+  console.log(`Student Service is running at http://localhost:3006`);
+  console.log(`Swagger is available at http://localhost:3006/api`);
 }
 bootstrap();

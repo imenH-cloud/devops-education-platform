@@ -1,0 +1,403 @@
+╔════════════════════════════════════════════════════════════════╗
+║     📊 GUIDE COMPLET - CRÉER DASHBOARDS GRAFANA                ║
+║            Horizons TSA - Monitoring & Visualization           ║
+╚════════════════════════════════════════════════════════════════╝
+
+═════════════════════════════════════════════════════════════════
+🚀 ÉTAPE 1: ACCÉDER À GRAFANA
+═════════════════════════════════════════════════════════════════
+
+1. Ouvrir navigateur web
+2. Aller à: http://localhost:30300
+3. Login:
+   - Username: admin
+   - Password: admin123
+4. Cliquer "Sign in"
+
+Vous verrez la page d'accueil Grafana avec:
+   • Navigation à gauche
+   • Recent dashboards
+   • Quick links
+
+═════════════════════════════════════════════════════════════════
+📈 ÉTAPE 2: VÉRIFIER LA DATASOURCE PROMETHEUS
+═════════════════════════════════════════════════════════════════
+
+La datasource Prometheus est déjà configurée!
+
+Pour vérifier:
+1. Menu gauche → Configuration ⚙️
+2. Cliquer "Data sources"
+3. Voir "Prometheus" listé
+4. Status: ✅ Green (Connected)
+
+Détails:
+   • Name: Prometheus
+   • Type: Prometheus
+   • URL: http://prometheus.monitoring.svc.cluster.local:9090
+   • Status: Connected
+
+═════════════════════════════════════════════════════════════════
+🎯 ÉTAPE 3: CRÉER UN NOUVEAU DASHBOARD
+═════════════════════════════════════════════════════════════════
+
+MÉTHODE 1: Créer un dashboard vide
+
+1. Menu gauche → "+" (Create)
+2. Cliquer "Dashboard"
+3. Cliquer "Add new panel"
+4. Cliquer "Add an empty panel"
+
+Vous verrez:
+   • Éditeur de requête en bas
+   • Aperçu du graphique en haut
+   • Options à droite
+
+MÉTHODE 2: Importer un dashboard pré-fait
+
+1. Menu gauche → "+" (Create)
+2. Cliquer "Import"
+3. Entrer ID Grafana (ex: 3662 pour Prometheus)
+4. Sélectionner datasource: Prometheus
+5. Cliquer "Import"
+
+═════════════════════════════════════════════════════════════════
+📊 ÉTAPE 4: AJOUTER DES PANNEAUX (Panels)
+═════════════════════════════════════════════════════════════════
+
+Un panel = Une visualisation (graphique, table, jauge, etc.)
+
+POUR AJOUTER UN PANEL:
+
+1. En bas à gauche, cliquer "Add panel"
+2. Ou cliquer le bouton "+" en haut
+
+TYPES DE PANELS DISPONIBLES:
+   • Timeseries (graph)     → Données dans le temps
+   • Stat                   → Valeur unique (jauge)
+   • Gauge                  → Jauge (0-100%)
+   • Table                  → Données tabulaires
+   • Pie chart              → Camembert
+   • Bar chart              → Diagramme en barres
+   • Heatmap                → Carte de chaleur
+   • Alert list             → Alertes
+   • Logs panel             → Affichage logs
+
+═════════════════════════════════════════════════════════════════
+🔍 ÉTAPE 5: ÉCRIRE DES REQUÊTES PROMETHEUS
+═════════════════════════════════════════════════════════════════
+
+Les requêtes PromQL permettent de récupérer les métriques.
+
+REQUÊTES DISPONIBLES POUR ARGOCD:
+
+1. État d'ArgoCD:
+   up{job="argocd"}
+   → Retourne 1 si UP, 0 si DOWN
+
+2. Nombre de syncs totales:
+   argocd_app_sync_total
+   → Nombre total de synchronisations
+
+3. Durée de réconciliation:
+   argocd_app_reconcile_duration_seconds
+   → Temps pris pour synchroniser
+
+4. Info serveur ArgoCD:
+   argocd_server_info
+   → Informations du serveur
+
+5. Nombre d'applications:
+   count(argocd_app_info)
+   → Nombre total d'apps
+
+EXEMPLE COMPLET - Créer un graphique de syncs:
+
+1. Ajouter un nouveau panel
+2. Dans "Metrics browser", entrer:
+   increase(argocd_app_sync_total[5m])
+3. Cliquer "Run queries" (Ctrl+Enter)
+4. Voir le graphique s'afficher
+5. Changer le titre: "App Syncs (5min)"
+6. Cliquer "Save" en haut à droite
+
+═════════════════════════════════════════════════════════════════
+🎨 ÉTAPE 6: CONFIGURER LA VISUALISATION
+═════════════════════════════════════════════════════════════════
+
+Après écrire une requête, configurer le panel:
+
+ONGLET "VISUALIZATIONS":
+   • Type: Choisir le type (Timeseries, Stat, etc.)
+   • Cliquer sur un type pour preview
+
+ONGLET "FIELD":
+   • Decimals: Nombre de décimales
+   • Color: Couleur du graphique
+   • Min/Max: Limites de l'axe
+
+ONGLET "PANEL":
+   • Title: Titre du panel
+   • Description: Description
+   • Transparent: Fond transparent
+
+ONGLET "LEGEND":
+   • Display mode: Comment afficher la légende
+   • Placement: Où placer la légende
+   • Calcs: Afficher min/max/mean
+
+EXEMPLE - Créer une jauge ArgoCD status:
+
+1. Ajouter panel
+2. Requête: up{job="argocd"}
+3. Visualizations → "Stat"
+4. Options:
+   • Color mode: "Background"
+   • Graph mode: "Area"
+   • Text mode: "Value and name"
+5. Field → Mappings:
+   • Add mapping
+   • Type: "Value"
+   • Values: 0→"DOWN", 1→"UP"
+6. Titre: "ArgoCD Status"
+7. Save
+
+═════════════════════════════════════════════════════════════════
+📋 ÉTAPE 7: EXEMPLES DE PANELS À CRÉER
+═════════════════════════════════════════════════════════════════
+
+PANEL 1 - ArgoCD Status (Stat)
+   Requête: up{job="argocd"}
+   Type: Stat
+   Titre: "ArgoCD Status"
+   
+PANEL 2 - Application Syncs (Bar chart)
+   Requête: increase(argocd_app_sync_total[5m])
+   Type: Bar chart
+   Titre: "App Syncs (5min)"
+   Legend: Show
+
+PANEL 3 - Reconcile Duration (Timeseries)
+   Requête: argocd_app_reconcile_duration_seconds
+   Type: Timeseries
+   Titre: "App Reconcile Duration"
+   Fill opacity: 10
+
+PANEL 4 - Total Applications (Gauge)
+   Requête: count(argocd_app_info)
+   Type: Gauge
+   Titre: "Total Applications"
+   Thresholds: 0=Red, 1=Yellow, 5=Green
+
+PANEL 5 - Prometheus Targets (Table)
+   Requête: up
+   Type: Table
+   Titre: "All Targets"
+   Format: Table
+
+═════════════════════════════════════════════════════════════════
+🎯 ÉTAPE 8: ORGANISER LES PANELS
+═════════════════════════════════════════════════════════════════
+
+LAYOUT:
+
+1. Cliquer "Edit" en haut du dashboard
+2. Pour chaque panel:
+   • Glisser pour déplacer
+   • Redimensionner en bas-droit
+   • Cliquer le panel pour éditer
+
+DISPOSITION RECOMMANDÉE:
+
+┌──────────────────────────────────────────────────────────┐
+│  ArgoCD Status (4x2)  │  Total Apps (4x2)  │  Prom (4x2) │
+├──────────────────────────────────────────────────────────┤
+│         App Syncs (6x3)        │   Duration (6x3)        │
+├──────────────────────────────────────────────────────────┤
+│              All Targets Status (12x3)                   │
+└──────────────────────────────────────────────────────────┘
+
+═════════════════════════════════════════════════════════════════
+💾 ÉTAPE 9: SAUVEGARDER LE DASHBOARD
+═════════════════════════════════════════════════════════════════
+
+1. En haut à droite, cliquer "Save"
+2. Entrer le nom: "Horizons TSA - ArgoCD Monitoring"
+3. Ajouter des tags: argocd, horizons-tsa, production
+4. Cliquer "Save"
+
+✅ Dashboard sauvegardé!
+
+Pour retrouver:
+   • Menu → "Dashboards" → "Manage"
+   • Ou chercher dans la barre de recherche
+
+═════════════════════════════════════════════════════════════════
+🔄 ÉTAPE 10: AJOUTER DES ALERTES
+═════════════════════════════════════════════════════════════════
+
+Créer une alerte si ArgoCD down:
+
+1. Ajouter un panel avec: up{job="argocd"}
+2. Cliquer l'onglet "Alert"
+3. Cliquer "Create alert from this query"
+4. Configurer:
+   • Condition: "Last value" "Is below" "1"
+   • Duration: "For 1m"
+   • Alert state: "ALERTING"
+5. Cliquer "Save"
+
+Maintenant, si ArgoCD down pendant 1 min → ALERTE!
+
+═════════════════════════════════════════════════════════════════
+📊 ÉTAPE 11: PANELS PRÉDÉFINIS DISPONIBLES
+═════════════════════════════════════════════════════════════════
+
+J'ai créé 2 dashboards prédéfinis:
+
+1️⃣ "🚀 Horizons TSA - ArgoCD Overview"
+   • ArgoCD Status (Stat)
+   • Server Info (Timeseries)
+   • App Syncs (Bar chart)
+   • Reconcile Duration (Timeseries)
+
+2️⃣ "💻 Horizons TSA - System Health"
+   • Prometheus Status (Stat)
+   • All Targets Status (Timeseries)
+
+ACCÉDER AUX DASHBOARDS:
+   • Menu → Dashboards → Manage
+   • Chercher "Horizons TSA"
+   • Cliquer pour ouvrir
+
+═════════════════════════════════════════════════════════════════
+🎓 GUIDE PRATIQUE - CRÉER TON PREMIER DASHBOARD
+═════════════════════════════════════════════════════════════════
+
+ÉTAPE PAR ÉTAPE (5 minutes):
+
+1. Accéder à Grafana: http://localhost:30300
+
+2. Créer dashboard:
+   Menu → "+" → "Dashboard" → "Add new panel"
+
+3. Ajouter Panel 1 (ArgoCD Status):
+   • Requête: up{job="argocd"}
+   • Visua: "Stat"
+   • Title: "ArgoCD Status"
+   • Cliquer "Apply"
+
+4. Ajouter Panel 2 (App Syncs):
+   • Cliquer "+" → "Add panel"
+   • Requête: increase(argocd_app_sync_total[5m])
+   • Visua: "Timeseries"
+   • Title: "App Syncs"
+   • Cliquer "Apply"
+
+5. Sauvegarder:
+   • Cliquer "Save" en haut
+   • Name: "Mon Premier Dashboard"
+   • Cliquer "Save"
+
+✅ FAIT! Tu as créé ton premier dashboard!
+
+═════════════════════════════════════════════════════════════════
+🎨 ASTUCES & TRICKS
+═════════════════════════════════════════════════════════════════
+
+1. AJOUTER DES VARIABLES (Templating):
+   • Edit Dashboard
+   • "Dashboard settings" (gear icon)
+   • "Variables"
+   • "Create new"
+   • Exemple: Variable pour sélectionner le job
+
+2. AJOUTER DES ANNOTATIONS:
+   • Panel → "Annotations"
+   • Ajouter événements ou repères
+
+3. EXPORTER/IMPORTER DASHBOARDS:
+   • Dashboard settings → "JSON model"
+   • Copy et sauvegarder
+   • Ou "Share" → "Export" → "Save as JSON"
+
+4. DÉFINIR L'INTERVALLE D'ACTUALISATION:
+   • En haut à droite: "Last 6 hours"
+   • Cliquer pour changer l'intervalle
+   • Auto-refresh: Cliquer le bouton "⏱️"
+
+5. PARTAGER UN DASHBOARD:
+   • Dashboard settings → "Share"
+   • Copy le lien
+   • Envoyer à l'équipe
+
+═════════════════════════════════════════════════════════════════
+❌ PROBLÈMES COURANTS & SOLUTIONS
+═════════════════════════════════════════════════════════════════
+
+PROBLÈME: "No data" dans le panel
+SOLUTION:
+  1. Vérifier la requête PromQL
+  2. Cliquer "Run queries"
+  3. Checker la plage horaire (top right)
+  4. Essayer: increase(metric[5m]) au lieu de metric
+
+PROBLÈME: Prometheus "DOWN" dans les targets
+SOLUTION:
+  C'est normal pour les services sans /metrics endpoint
+  - Les services education n'exposent pas de métriques
+  - Seulement ArgoCD est "UP"
+
+PROBLÈME: Panel ne s'affiche pas
+SOLUTION:
+  1. Refresh la page (F5)
+  2. Cliquer "Inspect" dans le panel
+  3. Voir les erreurs
+  4. Corriger la requête
+
+═════════════════════════════════════════════════════════════════
+✅ CHECKLIST - MONITORING COMPLET
+═════════════════════════════════════════════════════════════════
+
+Prometheus:
+  ✅ Restarté avec config simplifiée
+  ✅ ArgoCD target UP
+  ✅ Erreurs "down" supprimées
+
+Grafana:
+  ✅ 2 dashboards prédéfinis créés
+  ✅ Datasource Prometheus connectée
+  ✅ Visualisations disponibles
+
+À faire maintenant:
+  □ Accéder à Grafana
+  □ Visualiser les dashboards prédéfinis
+  □ Créer ton propre dashboard
+  □ Ajouter des panels personnalisés
+  □ Configurer des alertes
+
+═════════════════════════════════════════════════════════════════
+
+🎯 PROCHAINES ÉTAPES:
+
+1. ACCÉDER À GRAFANA:
+   http://localhost:30300
+   admin / admin123
+
+2. VÉRIFIER LES DASHBOARDS:
+   Menu → Dashboards → Manage
+   Chercher "Horizons TSA"
+
+3. CRÉER TES PROPRES VISUALISATIONS:
+   Suivre le guide "GUIDE PRATIQUE" ci-dessus
+
+4. AJOUTER DES ALERTES:
+   Panel → Alert → Configurer conditions
+
+═════════════════════════════════════════════════════════════════
+
+Questions? Consulte la documentation:
+📖 https://grafana.com/docs/grafana/latest/dashboards/
+📖 https://prometheus.io/docs/prometheus/latest/querying/
+
+═════════════════════════════════════════════════════════════════

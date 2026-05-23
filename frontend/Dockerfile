@@ -27,6 +27,6 @@ COPY --from=build /app/dist/front/browser /usr/share/nginx/html
 # Copie de la configuration nginx corrigée
 COPY nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 4200
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

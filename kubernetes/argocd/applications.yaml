@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+
+---
+# ArgoCD Application for HORIZONS TSA
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: horizons-tsa
+  namespace: argocd
+  # Finalizer for auto-deletion
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  # Source: GitHub GitOps Repository
+  source:
+    repoURL: https://github.com/imenH-cloud/devops-education-platform-gitops.git
+    targetRevision: main
+    path: kubernetes/base
+
+    # Kustomize configuration
+    kustomize:
+      version: v4.5.7
+
+  # Destination: Local Kubernetes Cluster
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: education
+
+  # Sync Policy: Automatic syncing
+  syncPolicy:
+    # Automatic sync
+    automated:
+      prune: true          # Delete resources not in Git
+      selfHeal: true       # Auto-sync on changes
+      allow: []
+
+    # Sync options
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - RespectIgnoreDifferences=true
+
+    # Retry policy
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Info about the app
+  info:
+    - name: 'Documentation'
+      value: 'https://github.com/imenH-cloud/devops-education-platform-gitops/blob/main/README.md'
+    - name: 'Docker Images'
+      value: 'https://hub.docker.com/u/eline2016'
+
+  # Revisions history
+  revisionHistoryLimit: 10
+
+  # Ignore differences (optional)
+  ignoreDifferences:
+    - group: 'apps'
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+
+---
+# ArgoCD Repository Secret (GitHub Connection)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: horizons-tsa-repo
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+type: Opaque
+stringData:
+  type: git
+  url: https://github.com/imenH-cloud/devops-education-platform-gitops.git
+  password: <YOUR_GITHUB_TOKEN>    # Replace with your token
+  username: imenH-cloud            # Replace with your username
+  insecure: 'false'
+  enableLFS: 'false'
+
+---
+# ArgoCD ApplicationSet for Multi-Environment Deployment (Optional)
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: horizons-tsa-envs
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: development
+            namespace: development
+            path: 'kubernetes/overlays/development'
+          - name: staging
+            namespace: staging
+            path: 'kubernetes/overlays/staging'
+          - name: production
+            namespace: production
+            path: 'kubernetes/overlays/production'
+  template:
+    metadata:
+      name: 'horizons-tsa-{{name}}'
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/imenH-cloud/devops-education-platform-gitops.git
+        targetRevision: main
+        path: '{{path}}'
+        kustomize:
+          version: v4.5.7
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
