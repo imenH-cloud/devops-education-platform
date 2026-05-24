@@ -151,9 +151,7 @@ services:
     restart: unless-stopped
 
   user-service:
-    build:
-      context: ./backend/user
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-user-service:v1
     container_name: user-service
     ports:
       - "3002:3002"
@@ -179,9 +177,7 @@ services:
     restart: unless-stopped
 
   auth-service:
-    build:
-      context: ./backend/auth
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-auth-service:v1
     container_name: auth-service
     ports:
       - "3001:3001"
@@ -205,9 +201,7 @@ services:
     restart: unless-stopped
 
   activity-service:
-    build:
-      context: ./backend/activity
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-activity-service:v1
     container_name: activity-service
     ports:
       - "3003:3003"
@@ -229,9 +223,7 @@ services:
     restart: unless-stopped
 
   classroom-service:
-    build:
-      context: ./backend/classroom
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-classroom-service:v1
     container_name: classroom-service
     ports:
       - "3006:3006"
@@ -255,9 +247,7 @@ services:
     restart: unless-stopped
 
   parent-service:
-    build:
-      context: ./backend/parent
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-parent-service:v1
     container_name: parent-service
     ports:
       - "3004:3004"
@@ -280,9 +270,7 @@ services:
     restart: unless-stopped
 
   student-service:
-    build:
-      context: ./backend/student
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-student-service:v1
     container_name: student-service
     ports:
       - "3005:3005"
@@ -301,9 +289,7 @@ services:
     restart: unless-stopped
 
   teacher-service:
-    build:
-      context: ./backend/teacher
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-teacher-service:v1
     container_name: teacher-service
     ports:
       - "3007:3007"
@@ -322,9 +308,7 @@ services:
     restart: unless-stopped
 
   gateway-backend:
-    build:
-      context: ./backend/gateway
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-gateway-backend:v1
     container_name: gateway-backend
     ports:
       - "3000:3000"
@@ -364,9 +348,7 @@ services:
     restart: unless-stopped
 
   frontend-app:
-    build:
-      context: ./frontend/app
-      dockerfile: Dockerfile
+    image: eline2016/devopspfe-frontend-app:v1
     container_name: frontend-app
     ports:
       - "4200:4200"
