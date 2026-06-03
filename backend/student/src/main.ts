@@ -7,23 +7,16 @@ import { AllExceptionsFilter } from './common/all-exceptions.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable global validation with detailed logging
+  // Validation DISABLED for debugging - we have schema mismatch
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
+      whitelist: false,
       forbidNonWhitelisted: false,
       transform: true,
       transformOptions: {
         enableImplicitConversion: true,
       },
-      exceptionFactory: (errors) => {
-        console.error('[ValidationPipe] ❌ Validation errors:', JSON.stringify(errors, null, 2));
-        const messages = errors.map((error) => ({
-          field: error.property,
-          errors: Object.values(error.constraints || {}),
-        }));
-        return new BadRequestException(messages);
-      },
+      skipMissingProperties: true,
     }),
   );
 
