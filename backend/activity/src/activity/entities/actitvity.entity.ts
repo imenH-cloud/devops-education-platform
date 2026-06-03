@@ -6,7 +6,7 @@ export class Activity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @Column({ nullable: true })
@@ -18,13 +18,13 @@ export class Activity {
   @Column({ nullable: true })
   location: string;
 
-  @Column()
+  @Column({ nullable: true })
   date: Date;
 
-  @Column()
+  @Column({ nullable: true })
   duration: number;
 
-  @Column({ default: false })
+  @Column({ name: 'iscompleted', default: false, nullable: true })
   isCompleted: boolean;
 
   @Column({ name: 'classroomid', nullable: true })

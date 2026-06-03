@@ -36,6 +36,11 @@ export class AppController {
   @Post('auth/login')
   login(@Body() authUserDto: any) { return this.appService.login(authUserDto); }
 
+  @Get('auth/login')
+  loginGet(@Query('email') email: string, @Query('password') password: string) {
+    return this.appService.login({ email, password });
+  }
+
   // Activity Service Endpoints
   @Get('activities')
   getActivities() { return this.appService.getActivities(); }
@@ -60,9 +65,6 @@ export class AppController {
 
   @Patch('activity/:id')
   updateActivityAlt(@Param('id') id: string, @Body() updateActivityDto: any) { return this.appService.updateActivity(id, updateActivityDto); }
-
-  @Put('activities/:id/complete')
-  completeActivity(@Param('id') id: string) { return this.appService.completeActivity(id); }
 
   @Delete('activities/:id')
   deleteActivity(@Param('id') id: string) { return this.appService.deleteActivity(id); }
