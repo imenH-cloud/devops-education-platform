@@ -1,0 +1,92 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-your-real-data
+  namespace: education
+spec:
+  template:
+    spec:
+      containers:
+      - name: psql
+        image: postgres:15
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          psql -h postgres-service -U postgres -d education <<'EOF'
+          -- Nettoyer
+          TRUNCATE TABLE activity CASCADE;
+          TRUNCATE TABLE student CASCADE;
+          TRUNCATE TABLE classroom CASCADE;
+          TRUNCATE TABLE parent CASCADE;
+          TRUNCATE TABLE teacher CASCADE;
+          TRUNCATE TABLE users CASCADE;
+          
+          -- TEACHERS (vos vrais enseignants)
+          INSERT INTO teacher (id, "indexNumber", cin, "firstName", surname, gender, address, telephone, email, specialization, "dateOfMandate") 
+          VALUES 
+          (1, 'IH001', '09876543', 'IMEN', 'HAMADA', 'F', 'Tozeur', '90545343', 'admin@school.com', 'DIRECTRICE', NOW()),
+          (2, 'AZ001', '09876543', 'aziza', 'zayer', 'F', 'Tozeur', '50987654', 'aziza@gmail.com', 'Education spécialisé', NOW()),
+          (3, 'SS001', '09876543', 'safwa', 'salem', 'F', 'unknown', '9823456', 'safwa@school.com', 'GESTIONNAIRE', NOW());
+          
+          -- PARENTS (vos vrais parents)
+          INSERT INTO parent (id, "firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) 
+          VALUES 
+          (1, 'nadia', 'el heni', 'nadia11@gmail.com', '90990900', '7654312', 'chebbia tozeur', 'CNSS', '175432', 'infirmiere'),
+          (2, 'chadha', 'khaldi', 'chadha1@gmail.com', '90878654', '7654567', 'chebbia tozeur', 'CNRPS', '1723456', 'enseignante'),
+          (3, 'ALI', 'BELDI', 'alibeldi@gmail.com', '20654234', '7345623', 'ras tabya tozeu', 'CNSS', '172345', 'COMMERCANT'),
+          (4, 'zahra', 'kaddouri', 'zahra@gmail.com', '0', '8453423', 'Degache', 'CNRPS', '0', 'femme de menage');
+          
+          -- CLASSROOMS
+          INSERT INTO classroom (id, name, capacity, grade, "academicYear", location, "Specialization") 
+          VALUES 
+          (1, 'Class A', 15, 'L1', '2024-2025', 'Building A', 'Autisme'),
+          (2, 'Class B', 16, 'L2', '2024-2025', 'Building B', 'Autisme'),
+          (3, 'Class C', 18, 'L3', '2024-2025', 'Building C', 'Autisme');
+          
+          -- STUDENTS (vos vrais étudiants)
+          INSERT INTO student (id, "firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") 
+          VALUES 
+          (4, 'sajed', 'S001', 'el heni', 'sajed1@gmail.com', '2015-01-01', '90767678', 'chebbia', '2024-09-01', 1, 1),
+          (5, 'Mohamed', 'S002', 'yazid jhimi', 'yazid@gmail.com', '2016-05-15', '23098335', 'Tozeur', '2024-09-01', 2, 2),
+          (6, 'yassine', 'S003', 'beldi', 'yassine@gmail.com', '2014-03-22', '20345654', 'Tozeur', '2024-09-01', 3, 2),
+          (7, 'abderrazak', 'S004', 'mahmoudi', 'abdou@gmail.com', '2013-11-10', '0', 'unknown', '2024-09-01', 4, 3);
+          
+          -- ACTIVITIES (vos vraies activités)
+          INSERT INTO activity (id, name, type, description, location, date, duration, "isCompleted", "classroomId") 
+          VALUES 
+          (1, 'SPORT', 'sports', 'SPORT ADAPTE', 'STADE', '2026-06-10 10:00', 30, false, 1),
+          (2, 'education spécialisé', 'academic', 'education spécialisée avec l''educatrice spécialisée aziza zayer et manel saidi', 'SALLE 1', '2026-06-11 14:00', 80, false, 2),
+          (3, 'ERGO', 'academic', 'SEANCE ERGO', 'SALLE D''ERGO', '2026-06-12 09:00', 60, false, 3);
+          
+          -- USERS/ADMIN
+          INSERT INTO users (email, password, "firstName", "lastName", active) 
+          VALUES ('admin@school.com', '$2b$10$sUd5PNEIskHsdJdN0KY/WuCfa/UEQRNNJaMoicghz61GXvoX1K9Ri', 'IMEN', 'HAMADA', true)
+          ON CONFLICT (email) DO NOTHING;
+          
+          -- VÉRIFICATION FINALE
+          SELECT '✓✓✓ VOS VRAIES DONNÉES RESTAURÉES ✓✓✓' AS status;
+          SELECT COUNT(*) AS "Teachers" FROM teacher;
+          SELECT COUNT(*) AS "Parents" FROM parent;
+          SELECT COUNT(*) AS "Classrooms" FROM classroom;
+          SELECT COUNT(*) AS "Students" FROM student;
+          SELECT COUNT(*) AS "Activities" FROM activity;
+          SELECT COUNT(*) AS "Users/Admins" FROM users;
+          
+          SELECT 'DÉTAIL - TEACHERS:' AS detail;
+          SELECT "firstName" || ' ' || surname, email, specialization FROM teacher;
+          
+          SELECT 'DÉTAIL - PARENTS:' AS detail;
+          SELECT "firstName" || ' ' || "lastName", email, job, "typeInsurance" FROM parent;
+          
+          SELECT 'DÉTAIL - STUDENTS:' AS detail;
+          SELECT "firstName" || ' ' || "lastName", email FROM student;
+          
+          SELECT 'DÉTAIL - ACTIVITIES:' AS detail;
+          SELECT name, type, location, duration FROM activity;
+          EOF
+      restartPolicy: Never
+  backoffLimit: 3

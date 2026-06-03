@@ -132,11 +132,13 @@ export class CreateActivityTable1698765432100 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('activity');
-    const foreignKey = table.foreignKeys.find(
-      (fk) => fk.columnNames.indexOf('classroomId') !== -1,
-    );
-    if (foreignKey) {
-      await queryRunner.dropForeignKey('activity', foreignKey);
+    if (table) {
+      const foreignKey = table.foreignKeys.find(
+        (fk) => fk.columnNames.indexOf('classroomId') !== -1,
+      );
+      if (foreignKey) {
+        await queryRunner.dropForeignKey('activity', foreignKey);
+      }
     }
     await queryRunner.dropTable('activity', true);
   }

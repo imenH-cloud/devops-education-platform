@@ -10,8 +10,11 @@ import { Router } from '@angular/router';
     standalone: false
 })
 export class AddComponent {
- classroomForm: FormGroup;
+  classroomForm: FormGroup;
   submitted = false;
+  loading = false;
+  showError = false;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -37,19 +40,40 @@ export class AddComponent {
   }
 
   onSubmit(): void {
-    this.submitted = true;
-
+    console.log('✅ onSubmit called');
+    console.log('Form status:', this.classroomForm.status);
+    console.log('Form value:', this.classroomForm.value);
     
+    this.submitted = true;
+    this.showError = false;
 
-    console.log('Submitting Classroom:', this.classroomForm.value);
+    if (!this.classroomForm.valid) {
+      this.showError = true;
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires correctement';
+      console.error('❌ Form invalid - Status:', this.classroomForm.status);
+      for (const control in this.classroomForm.controls) {
+        const c = this.classroomForm.get(control);
+        if (c && c.invalid) {
+          console.error(`Field ${control} invalid:`, c.errors);
+        }
+      }
+      return;
+    }
+
+    this.loading = true;
+    console.log('✅ Creating classroom with data:', this.classroomForm.value);
 
     this.classroomService.create(this.classroomForm.value).subscribe({
-      next: (response:any) => {
-        console.log('Classroom created:', response);
+      next: (response: any) => {
+        console.log('✅ Classroom created successfully:', response);
+        this.loading = false;
         this.router.navigate(['/classroom']);
       },
-      error: (error:any) => {
-        console.error('Error creating classroom:', error);
+      error: (error: any) => {
+        console.error('❌ Error creating classroom:', error);
+        this.loading = false;
+        this.showError = true;
+        this.errorMessage = error?.error?.message || 'Erreur lors de la création de la salle de classe';
       }
     });
   }

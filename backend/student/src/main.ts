@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './common/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,9 @@ async function bootstrap() {
     }),
   );
 
+  // Global exception filter
+  app.useGlobalFilters(new AllExceptionsFilter());
+
   // Swagger config
   const config = new DocumentBuilder()
     .setTitle('Student Service')
@@ -31,9 +35,9 @@ async function bootstrap() {
 
   app.enableCors();
 
-  await app.listen(3006, '0.0.0.0');
+  await app.listen(3005, '0.0.0.0');
 
-  console.log(`Student Service is running at http://localhost:3006`);
-  console.log(`Swagger is available at http://localhost:3006/api`);
+  console.log(`Student Service is running at http://localhost:3005`);
+  console.log(`Swagger is available at http://localhost:3005/api`);
 }
 bootstrap();

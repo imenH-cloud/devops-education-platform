@@ -1,0 +1,68 @@
+---
+# Clean Education Platform Application - Points to devops-education-platform repo
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: education-platform
+  namespace: argocd-test
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: horizons-education
+
+  # Source: Your main devops-education-platform repo (with fresh manifests)
+  source:
+    repoURL: https://github.com/imenH-cloud/devops-education-platform.git
+    targetRevision: main
+    path: kubernetes          # Points to /kubernetes directory with all services
+    
+  # Destination: education namespace on local cluster
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: education
+
+  # Sync Policy: Manual for safety (prevents accidental rollbacks to old images)
+  syncPolicy:
+    # Manual sync - you control when to sync
+    automated:
+      prune: false            # Don't auto-delete if removed from Git
+      selfHeal: false         # Don't auto-sync on cluster changes
+    
+    syncOptions:
+      - CreateNamespace=true
+
+    # Retry policy for sync failures
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Revision history for rollback safety
+  revisionHistoryLimit: 10
+
+  # Application info
+  info:
+    - name: 'GitHub Repo'
+      value: 'https://github.com/imenH-cloud/devops-education-platform'
+    - name: 'Docker Hub'
+      value: 'https://hub.docker.com/u/eline2016'
+    - name: 'Services'
+      value: 'auth, user, activity, parent, student, classroom, teacher, gateway, frontend'
+
+---
+# Repository Secret - Only for devops-education-platform
+apiVersion: v1
+kind: Secret
+metadata:
+  name: education-platform-repo
+  namespace: argocd-test
+  labels:
+    argocd.argoproj.io/secret-type: repository
+type: Opaque
+stringData:
+  type: git
+  url: https://github.com/imenH-cloud/devops-education-platform.git
+  insecure: 'false'
+  enableLFS: 'false'

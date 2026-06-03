@@ -1,10 +1,11 @@
-﻿import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { MetricsController } from './metrics/metrics.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ActitvityModule } from './activity/actitvity.module';
+import { HealthModule } from './health/health.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
@@ -28,7 +29,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         },
       },
     ]),
-   TypeOrmModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -39,25 +40,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         password: configService.get<string>('DB_PASSWORD', 'postgres'),
         database: configService.get<string>('DB_NAME', 'education'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
-
-    
-
-    
-
-    
-
-    
-
-    
     ActitvityModule,
-
-    
+    HealthModule,
   ],
   controllers: [AppController, MetricsController],
   providers: [AppService],
 })
 export class AppModule {}
-

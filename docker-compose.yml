@@ -351,7 +351,7 @@ services:
     image: eline2016/devopspfe-frontend-app:v1
     container_name: frontend-app
     ports:
-      - "4200:4200"
+      - "31927:4200"
     depends_on:
       - gateway-backend
     networks:

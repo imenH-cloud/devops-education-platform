@@ -1,0 +1,99 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: final-data-load
+  namespace: education
+spec:
+  template:
+    spec:
+      containers:
+      - name: psql
+        image: postgres:15
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          psql -h postgres-service -U postgres -d education <<'EOF'
+          -- Désactiver les contraintes temporairement
+          ALTER TABLE student DISABLE TRIGGER ALL;
+          ALTER TABLE activity DISABLE TRIGGER ALL;
+          
+          -- Nettoyer les données existantes
+          TRUNCATE TABLE activity CASCADE;
+          TRUNCATE TABLE student CASCADE;
+          TRUNCATE TABLE classroom CASCADE;
+          TRUNCATE TABLE parent CASCADE;
+          TRUNCATE TABLE teacher CASCADE;
+          TRUNCATE TABLE users CASCADE;
+          
+          -- Réactiver les triggers
+          ALTER TABLE student ENABLE TRIGGER ALL;
+          ALTER TABLE activity ENABLE TRIGGER ALL;
+          
+          -- Charger les Teachers
+          INSERT INTO teacher ("indexNumber", cin, "firstName", surname, gender, address, telephone, email, specialization, "dateOfMandate") 
+          VALUES 
+          ('T001', '111', 'Imen', 'Hamada', 'F', 'Tozeur', '01234567', 'imen@school.com', 'Math', NOW()),
+          ('T002', '222', 'Marie', 'Curie', 'F', 'Paris', '01234568', 'marie@school.com', 'Physics', NOW()),
+          ('T003', '333', 'Albert', 'Einstein', 'M', 'Berlin', '01234569', 'albert@school.com', 'Physics', NOW()),
+          ('T004', '444', 'Ada', 'Lovelace', 'F', 'London', '01234570', 'ada@school.com', 'IT', NOW());
+          
+          -- Charger les Parents EN PREMIER (avant students qui les référencent)
+          INSERT INTO parent (id, "firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) 
+          VALUES 
+          (1, 'Jean', 'Martin', 'jean@email.com', '0612345678', '111', 'Paris', 'Mutuelle', 'M123', 'Engineer'),
+          (2, 'Sophie', 'Bernard', 'sophie@email.com', '0623456789', '222', 'Lyon', 'SS', 'S234', 'Teacher'),
+          (3, 'Michel', 'Durand', 'michel@email.com', '0634567890', '333', 'Marseille', 'Mutuelle', 'M345', 'Doctor'),
+          (4, 'Isabelle', 'Petit', 'isabelle@email.com', '0645678901', '444', 'Toulouse', 'SS', 'S456', 'Lawyer');
+          
+          -- Charger les Classrooms EN SECOND (avant students qui les référencent)
+          INSERT INTO classroom (id, name, capacity, grade, "academicYear", location, "Specialization") 
+          VALUES 
+          (1, 'Class A', 15, 'L1', '2024-2025', 'Building A', 'General'),
+          (2, 'Class B', 16, 'L2', '2024-2025', 'Building B', 'General'),
+          (3, 'Class C', 18, 'L3', '2024-2025', 'Building C', 'General');
+          
+          -- Charger les Students (après parents et classrooms)
+          INSERT INTO student ("firstName", "numeroInscriptio", "lastName", email, "dateOfBirth", "phoneNumber", address, "enrollmentDate", "parentId", "classroomId") 
+          VALUES 
+          ('Lucas', 'S001', 'Martin', 'lucas@student.com', '2012-05-15', '0612', 'Paris', '2024-09-01', 1, 1),
+          ('Emma', 'S002', 'Martin', 'emma@student.com', '2014-08-22', '0613', 'Paris', '2024-09-01', 1, 1),
+          ('Thomas', 'S003', 'Bernard', 'thomas@student.com', '2011-03-10', '0623', 'Lyon', '2024-09-01', 2, 2),
+          ('Julie', 'S004', 'Bernard', 'julie@student.com', '2013-11-30', '0624', 'Lyon', '2024-09-01', 2, 2),
+          ('Camille', 'S005', 'Durand', 'camille@student.com', '2010-09-12', '0634', 'Marseille', '2024-09-01', 3, 3),
+          ('Nathan', 'S006', 'Durand', 'nathan@student.com', '2015-01-25', '0635', 'Marseille', '2024-09-01', 3, 3),
+          ('Chloe', 'S007', 'Petit', 'chloe@student.com', '2012-07-18', '0645', 'Toulouse', '2024-09-01', 4, 1);
+          
+          -- Charger les Activities avec duration obligatoire
+          INSERT INTO activity (name, type, description, location, date, duration, "isCompleted", "classroomId") 
+          VALUES 
+          ('Sensory', 'academic', 'Sensory awareness activity', 'Room1', '2026-05-25 10:00', 60, false, 1),
+          ('Social', 'academic', 'Social interaction activity', 'Room2', '2026-05-26 14:00', 90, false, 2),
+          ('Yoga', 'wellness', 'Relaxation yoga session', 'Room3', '2026-05-27 09:00', 45, false, 1),
+          ('Communication', 'academic', 'Communication skills workshop', 'Room4', '2026-05-28 15:00', 120, false, 3),
+          ('Puzzle', 'cognitive', 'Puzzle solving activity', 'Room5', '2026-05-29 11:00', 75, false, 1),
+          ('PECS', 'academic', 'Picture Exchange Communication System', 'Room6', '2026-05-30 10:30', 60, false, 3),
+          ('Music', 'cultural', 'Music and rhythm session', 'Room7', '2026-05-31 14:30', 90, false, 2),
+          ('Drawing', 'cultural', 'Art and drawing workshop', 'Room8', '2026-06-01 13:00', 60, false, 2),
+          ('Motor', 'physical', 'Motor skills course', 'Room9', '2026-06-02 10:00', 80, false, 2),
+          ('Ball', 'physical', 'Ball games and sports', 'Room10', '2026-06-03 15:30', 90, false, 2);
+          
+          -- Ajouter le compte admin
+          INSERT INTO users (email, password, "firstName", "lastName", active) 
+          VALUES ('admin@school.com', '$2b$10$sUd5PNEIskHsdJdN0KY/WuCfa/UEQRNNJaMoicghz61GXvoX1K9Ri', 'Admin', 'School', true)
+          ON CONFLICT (email) DO NOTHING;
+          
+          -- Vérification finale
+          SELECT '✓ DONNÉES COMPLÈTEMENT CHARGÉES ✓' AS status;
+          SELECT COUNT(*) AS "Teachers" FROM teacher;
+          SELECT COUNT(*) AS "Parents" FROM parent;
+          SELECT COUNT(*) AS "Classrooms" FROM classroom;
+          SELECT COUNT(*) AS "Students" FROM student;
+          SELECT COUNT(*) AS "Activities" FROM activity;
+          SELECT COUNT(*) AS "Admin Users" FROM users;
+          EOF
+      restartPolicy: Never
+  backoffLimit: 3

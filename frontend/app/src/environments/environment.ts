@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:31000'  // Gateway sur port 31000
+  apiUrl: ''  // Vide - nginx proxy intercepte /auth, /parent, /student, etc.
 };

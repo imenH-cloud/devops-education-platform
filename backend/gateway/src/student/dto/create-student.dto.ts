@@ -9,6 +9,6 @@ export class CreateStudentDto {
   address: string;
   isActive?: boolean;
   enrollmentDate: Date;
-  
-
+  observations?: string;
+  interventionReports?: Record<string, any>[];
 }

@@ -18,8 +18,8 @@ export class CreateParentDto {
     phoneNumber: string;
 
     @IsNotEmpty()
-    @IsNumber()
-    NCIN: number;
+    @IsString()
+    NCIN: string;
 
     @IsNotEmpty()
     @IsString()

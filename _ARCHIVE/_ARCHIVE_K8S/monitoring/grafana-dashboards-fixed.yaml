@@ -1,0 +1,277 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-working-final
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  prometheus-stats.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "red", "value": 80}
+                ]
+              }
+            }
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "id": 1,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {"values": false, "calcs": ["lastNotNull"]},
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "targets": [
+            {
+              "expr": "process_resident_memory_bytes{job=\"prometheus\"}",
+              "legendFormat": "Prometheus Memory",
+              "refId": "A"
+            }
+          ],
+          "title": "Prometheus Memory Usage (bytes)",
+          "type": "gauge"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "palette-classic"},
+              "custom": {
+                "axisLabel": "CPU Seconds",
+                "axisPlacement": "auto",
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "lineWidth": 1,
+                "showPoints": "never",
+                "spanNulls": true
+              },
+              "mappings": [],
+              "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}
+            }
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "id": 2,
+          "options": {
+            "legend": {"calcs": ["mean", "max"], "displayMode": "table", "placement": "right"},
+            "tooltip": {"mode": "single"}
+          },
+          "targets": [
+            {
+              "expr": "rate(process_cpu_seconds_total{job=\"prometheus\"}[5m])",
+              "legendFormat": "Prometheus CPU",
+              "refId": "A"
+            },
+            {
+              "expr": "rate(process_cpu_seconds_total{job=\"grafana\"}[5m])",
+              "legendFormat": "Grafana CPU",
+              "refId": "B"
+            }
+          ],
+          "title": "CPU Usage (5m rate)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "palette-classic"},
+              "custom": {
+                "axisLabel": "Memory (MB)",
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "lineWidth": 2,
+                "showPoints": "never"
+              }
+            }
+          },
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+          "id": 3,
+          "options": {
+            "legend": {"calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom"},
+            "tooltip": {"mode": "multi"}
+          },
+          "targets": [
+            {
+              "expr": "process_resident_memory_bytes{job=~\"prometheus|grafana\"} / 1024 / 1024",
+              "legendFormat": "{{ job }}",
+              "refId": "A"
+            }
+          ],
+          "title": "Memory Usage Timeline (MB)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "thresholds"},
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": null},
+                  {"color": "green", "value": 1}
+                ]
+              }
+            }
+          },
+          "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16},
+          "id": 4,
+          "options": {"reduceOptions": {"values": false, "calcs": ["lastNotNull"]}},
+          "targets": [
+            {
+              "expr": "up{job=\"prometheus\"}",
+              "legendFormat": "Prometheus",
+              "refId": "A"
+            }
+          ],
+          "title": "Prometheus Status",
+          "type": "stat"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "thresholds"},
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": null},
+                  {"color": "green", "value": 1}
+                ]
+              }
+            }
+          },
+          "gridPos": {"h": 4, "w": 6, "x": 6, "y": 16},
+          "id": 5,
+          "options": {"reduceOptions": {"values": false, "calcs": ["lastNotNull"]}},
+          "targets": [
+            {
+              "expr": "up{job=\"grafana\"}",
+              "legendFormat": "Grafana",
+              "refId": "A"
+            }
+          ],
+          "title": "Grafana Status",
+          "type": "stat"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "thresholds"},
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{"color": "blue", "value": null}]
+              }
+            }
+          },
+          "gridPos": {"h": 4, "w": 12, "x": 12, "y": 16},
+          "id": 6,
+          "options": {"reduceOptions": {"values": false, "calcs": ["lastNotNull"]}, "text": {}},
+          "targets": [
+            {
+              "expr": "time() - process_start_time_seconds{job=\"prometheus\"}",
+              "legendFormat": "Uptime (seconds)",
+              "refId": "A"
+            }
+          ],
+          "title": "Prometheus Uptime (seconds)",
+          "type": "stat"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 27,
+      "style": "dark",
+      "tags": ["prometheus", "monitoring"],
+      "templating": {"list": []},
+      "time": {"from": "now-1h", "to": "now"},
+      "timezone": "",
+      "title": "Prometheus & Grafana Monitoring",
+      "uid": "prometheus-monitoring",
+      "version": 1
+    }
+
+  system-health.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "palette-classic"},
+              "custom": {
+                "axisLabel": "Value",
+                "drawStyle": "bars",
+                "fillOpacity": 100,
+                "lineWidth": 1,
+                "showPoints": "never"
+              }
+            }
+          },
+          "gridPos": {"h": 12, "w": 24, "x": 0, "y": 0},
+          "id": 1,
+          "options": {
+            "legend": {"displayMode": "table", "placement": "bottom"},
+            "tooltip": {"mode": "multi"}
+          },
+          "targets": [
+            {
+              "expr": "up",
+              "legendFormat": "{{ job }} - {{ instance }}",
+              "refId": "A"
+            }
+          ],
+          "title": "All Targets Up/Down Status",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 27,
+      "style": "dark",
+      "tags": ["system", "health"],
+      "time": {"from": "now-6h", "to": "now"},
+      "timezone": "",
+      "title": "System Health",
+      "uid": "system-health",
+      "version": 1
+    }

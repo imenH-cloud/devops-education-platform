@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './common/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,9 +31,10 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors();
+  app.useGlobalFilters(new AllExceptionsFilter());
 
-  // Parent service écoute sur 3005
-  const port = process.env.PORT || 3005;
+  // Parent service écoute sur 3004
+  const port = process.env.PORT || 3004;
   await app.listen(port, '0.0.0.0');
 
   console.log(`Parent Service is running at http://localhost:${port}`);

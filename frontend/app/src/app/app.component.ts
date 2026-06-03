@@ -14,10 +14,10 @@ export class AppComponent implements OnInit {
   title = 'front';
   userMenuOpen = false;
   
-  // User info
-  userName = 'IMEN HAMADA';
+  // User info - Update with your details
+  userName = 'Admin';
   userEmail = 'admin@school.com';
-  userPhoto = 'https://firebasestorage.googleapis.com/v0/b/devopspfe-6ac57.appspot.com/o/imen-profile.jpg?alt=media'; // Replace with your photo URL
+  userPhoto = 'https://i.pravatar.cc/150?img=5'; // Avatar générique
 
   constructor(private router: Router,
         @Inject(PLATFORM_ID) private platformId: object

@@ -1,0 +1,159 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-provisioning
+  namespace: monitoring
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    
+    providers:
+      - name: 'Dashboards'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-json-final
+  namespace: monitoring
+data:
+  education-dashboard.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}},
+          "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+          "id": 1,
+          "targets": [{"expr": "up{job=\"prometheus\"}", "refId": "A"}],
+          "title": "Prometheus Status",
+          "type": "stat"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}},
+          "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+          "id": 2,
+          "targets": [{"expr": "up{job=\"grafana\"}", "refId": "A"}],
+          "title": "Grafana Status",
+          "type": "stat"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "unit": "decbytes"}},
+          "gridPos": {"h": 4, "w": 12, "x": 12, "y": 0},
+          "id": 3,
+          "targets": [{"expr": "process_resident_memory_bytes{job=~\"prometheus|grafana\"}", "legendFormat": "{{ job }}", "refId": "A"}],
+          "title": "Memory Usage (Bytes)",
+          "type": "stat"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {"defaults": {"custom": {"fillOpacity": 10, "lineWidth": 1}}},
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 4},
+          "id": 4,
+          "options": {"legend": {"calcs": ["mean", "max"], "displayMode": "table"}},
+          "targets": [{"expr": "process_resident_memory_bytes{job=~\"prometheus|grafana\"} / 1024 / 1024", "legendFormat": "{{ job }}", "refId": "A"}],
+          "title": "Memory Usage Timeline (MB)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": "Prometheus",
+          "fieldConfig": {"defaults": {"custom": {"fillOpacity": 10, "lineWidth": 1}}},
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 12},
+          "id": 5,
+          "options": {"legend": {"calcs": ["mean", "max"], "displayMode": "table"}},
+          "targets": [{"expr": "rate(process_cpu_seconds_total{job=~\"prometheus|grafana\"}[5m])", "legendFormat": "{{ job }}", "refId": "A"}],
+          "title": "CPU Usage (5m)",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 27,
+      "style": "dark",
+      "tags": ["education", "monitoring", "production"],
+      "templating": {"list": []},
+      "time": {"from": "now-1h", "to": "now"},
+      "timezone": "browser",
+      "title": "Education Platform - Monitoring",
+      "uid": "education-monitoring",
+      "version": 1
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: admin
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: admin123
+        - name: GF_USERS_ALLOW_SIGN_UP
+          value: "false"
+        - name: GF_PATHS_PROVISIONING
+          value: /etc/grafana/provisioning
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+        - name: provisioning-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: provisioning-dashboards
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: dashboards-json
+          mountPath: /var/lib/grafana/dashboards
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: grafana-storage
+        emptyDir: {}
+      - name: provisioning-datasources
+        configMap:
+          name: grafana-provisioning-datasources-fixed
+      - name: provisioning-dashboards
+        configMap:
+          name: grafana-dashboard-provisioning
+      - name: dashboards-json
+        configMap:
+          name: grafana-dashboards-json-final

@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: restore-admin-script
+  namespace: education
+data:
+  restore.sql: |
+    -- Créer les tables si elles n'existent pas
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      "firstName" TEXT,
+      "lastName" TEXT,
+      phone TEXT,
+      picture TEXT,
+      address TEXT,
+      zipcode TEXT,
+      password TEXT,
+      "saltRounds" TEXT,
+      token TEXT,
+      active BOOLEAN DEFAULT true,
+      "createdAt" TIMESTAMP WITH TIME ZONE,
+      "createdBy" INTEGER,
+      "updatedAt" TIMESTAMP WITH TIME ZONE,
+      "updatedBy" INTEGER,
+      "deletedAt" TIMESTAMP WITH TIME ZONE
+    );
+
+    CREATE TABLE IF NOT EXISTS parent (
+      id SERIAL PRIMARY KEY,
+      "firstName" VARCHAR NOT NULL,
+      "lastName" VARCHAR NOT NULL,
+      email VARCHAR UNIQUE NOT NULL,
+      "phoneNumber" VARCHAR NOT NULL,
+      "NCIN" VARCHAR NOT NULL,
+      address VARCHAR NOT NULL,
+      "typeInsurance" VARCHAR NOT NULL,
+      "Numeroinsurance" VARCHAR NOT NULL,
+      job VARCHAR NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS classroom (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR NOT NULL,
+      capacity INTEGER NOT NULL,
+      grade VARCHAR NOT NULL,
+      description VARCHAR,
+      "academicYear" VARCHAR NOT NULL,
+      "isActive" BOOLEAN DEFAULT true NOT NULL,
+      location VARCHAR(50) NOT NULL,
+      "Specialization" VARCHAR NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS student (
+      id SERIAL PRIMARY KEY,
+      "firstName" VARCHAR NOT NULL,
+      "numeroInscriptio" VARCHAR NOT NULL,
+      "lastName" VARCHAR NOT NULL,
+      email VARCHAR UNIQUE NOT NULL,
+      "dateOfBirth" DATE NOT NULL,
+      "phoneNumber" VARCHAR NOT NULL,
+      address VARCHAR NOT NULL,
+      "isActive" BOOLEAN DEFAULT true NOT NULL,
+      "enrollmentDate" DATE NOT NULL,
+      "parentId" INTEGER,
+      "classroomId" INTEGER,
+      FOREIGN KEY ("parentId") REFERENCES parent(id),
+      FOREIGN KEY ("classroomId") REFERENCES classroom(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS activity (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR NOT NULL,
+      type VARCHAR,
+      description TEXT,
+      location VARCHAR,
+      date TIMESTAMP NOT NULL,
+      duration INTEGER NOT NULL,
+      "isCompleted" BOOLEAN DEFAULT false,
+      metadata TEXT,
+      "classroomId" INTEGER,
+      FOREIGN KEY ("classroomId") REFERENCES classroom(id)
+    );
+
+    -- Restaurer le compte admin
+    DELETE FROM users WHERE email = 'admin@school.com';
+    INSERT INTO users (email, password, "firstName", "lastName", active) 
+    VALUES ('admin@school.com', '$2b$10$sUd5PNEIskHsdJdN0KY/WuCfa/UEQRNNJaMoicghz61GXvoX1K9Ri', 'Admin', 'School', true)
+    ON CONFLICT (email) DO NOTHING;
+
+    -- Restaurer les parents
+    DELETE FROM parent WHERE id IN (1, 2);
+    INSERT INTO parent (id, "firstName", "lastName", email, "phoneNumber", "NCIN", address, "typeInsurance", "Numeroinsurance", job) 
+    VALUES 
+    (1, 'Ahmed', 'Ben Salah', 'ahmed.bensalah@example.com', '22112233', '12345678', 'Rue de Tunis, Ariana', 'CNAM', 'INS123456789', 'Enseignant'),
+    (2, 'houda', 'rouissi', 'houdaR@gmail.com', '50987654', '7564534', 'TOZEUR', 'CNAM', '887654345678', 'enseignant');
+
+    -- Restaurer les classrooms
+    DELETE FROM classroom WHERE id = 1;
+    INSERT INTO classroom (id, name, capacity, grade, description, "academicYear", "isActive", location, "Specialization") 
+    VALUES (1, 'educationSssspcial i sé', 8, '1', 'classe des autistes 1', '', true, 'classe1', 'autisme');
+
+    -- Restaurer les students
+    DELETE FROM student WHERE id = 1;
+    INSERT INTO student (id, "firstName", "numeroInscriptio", "lastName", email, "phoneNumber", address, "isActive", "parentId", "classroomId", "dateOfBirth", "enrollmentDate") 
+    VALUES (1, 'nada', '', 'salhi', '', '9054534343', 'hammet jarid', true, 2, NULL, '2025-06-02', '2025-06-03');
+
+    -- Restaurer les activities
+    DELETE FROM activity WHERE id = 1;
+    INSERT INTO activity (id, name, type, description, location, date, duration, "isCompleted", metadata, "classroomId") 
+    VALUES (1, 'orthophonie:;;%c%ll', 'academic', 'seances d''orthophonie', 'utaim', '2025-06-10 00:00:00', 14, true, '{"resources":[""],"attachments":[""],"comments":""}', 1);
+
+    SELECT 'Données restaurées avec succès!' AS status;
+    SELECT email, "firstName", "lastName" FROM users WHERE email = 'admin@school.com';
+    SELECT COUNT(*) AS parent_count FROM parent;
+    SELECT COUNT(*) AS classroom_count FROM classroom;
+    SELECT COUNT(*) AS student_count FROM student;
+    SELECT COUNT(*) AS activity_count FROM activity;
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: restore-admin-final
+  namespace: education
+spec:
+  template:
+    spec:
+      containers:
+      - name: psql
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        volumeMounts:
+        - name: script
+          mountPath: /scripts
+        command:
+        - /bin/sh
+        - -c
+        - |
+          psql -h postgres-service -U postgres -d education -f /scripts/restore.sql
+      volumes:
+      - name: script
+        configMap:
+          name: restore-admin-script
+      restartPolicy: Never
+  backoffLimit: 3

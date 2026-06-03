@@ -2,17 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Parent } from './parent';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ParentService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/parent`;
 
   getAll(): Observable<Parent[]> {
-    return this.http.get<Parent[]>(this.apiUrl);
+    return this.http.get<Parent[]>('/parent', { withCredentials: true });
   }
 
   getParents(): Observable<Parent[]> {
@@ -20,7 +18,7 @@ export class ParentService {
   }
 
   getById(id: number): Observable<Parent> {
-    return this.http.get<Parent>(`${this.apiUrl}/${id}`);
+    return this.http.get<Parent>(`/parent/${id}`, { withCredentials: true });
   }
 
   getParentById(id: number): Observable<Parent> {
@@ -28,7 +26,8 @@ export class ParentService {
   }
 
   create(parent: Partial<Parent>): Observable<Parent> {
-    return this.http.post<Parent>(this.apiUrl, parent);
+    console.log('Creating parent via API:', '/parent', parent);
+    return this.http.post<Parent>('/parent', parent, { withCredentials: true });
   }
 
   createParent(parent: Partial<Parent>): Observable<Parent> {
@@ -36,7 +35,7 @@ export class ParentService {
   }
 
   update(id: number, parent: Partial<Parent>): Observable<Parent> {
-    return this.http.patch<Parent>(`${this.apiUrl}/${id}`, parent);
+    return this.http.patch<Parent>(`/parent/${id}`, parent, { withCredentials: true });
   }
 
   updateParent(id: number, parent: Partial<Parent>): Observable<Parent> {
@@ -44,7 +43,7 @@ export class ParentService {
   }
 
   delete(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`/parent/${id}`, { withCredentials: true });
   }
 
   deleteParent(id: number): Observable<any> {
@@ -52,6 +51,6 @@ export class ParentService {
   }
 
   deleteMultipleParents(ids: number[]): Observable<any> {
-    return this.http.post(`${this.apiUrl}/delete-multiple`, { ids });
+    return this.http.post('/parent/delete-multiple', { ids }, { withCredentials: true });
   }
 }

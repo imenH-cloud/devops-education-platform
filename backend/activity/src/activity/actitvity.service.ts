@@ -19,10 +19,10 @@ export class ActivityService {
     console.log('[POST /activity] Saving activity:', activity);
     try {
       const result = await this.activityRepository.save(activity);
-      console.log('[POST /activity] ✅ Created successfully:', result);
+      console.log('[POST /activity] Successfully created:', result);
       return result;
     } catch (error) {
-      console.error('[POST /activity] ❌ Error:', error);
+      console.error('[POST /activity] Error:', error);
       throw error;
     }
   }

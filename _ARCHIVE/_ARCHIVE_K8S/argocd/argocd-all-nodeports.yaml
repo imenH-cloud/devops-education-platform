@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-server-nodeport
+  namespace: argocd-new
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+    nodePort: 31380
+  - name: https
+    port: 443
+    targetPort: 8080
+    protocol: TCP
+    nodePort: 31443
+  selector:
+    app.kubernetes.io/name: argocd-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-repo-server-nodeport
+  namespace: argocd-new
+spec:
+  type: NodePort
+  ports:
+  - name: server
+    port: 8081
+    targetPort: 8081
+    protocol: TCP
+    nodePort: 31381
+  selector:
+    app.kubernetes.io/name: argocd-repo-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-redis-nodeport
+  namespace: argocd-new
+spec:
+  type: NodePort
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+    protocol: TCP
+    nodePort: 31382
+  selector:
+    app.kubernetes.io/name: argocd-redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-metrics-nodeport
+  namespace: argocd-new
+spec:
+  type: NodePort
+  ports:
+  - name: metrics
+    port: 8082
+    targetPort: 8082
+    protocol: TCP
+    nodePort: 31383
+  selector:
+    app.kubernetes.io/name: argocd-application-controller
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-server-metrics-nodeport
+  namespace: argocd-new
+spec:
+  type: NodePort
+  ports:
+  - name: server-metrics
+    port: 8083
+    targetPort: 8083
+    protocol: TCP
+    nodePort: 31384
+  selector:
+    app.kubernetes.io/name: argocd-server

@@ -8,8 +8,16 @@ export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
   @Post()
-  create(@Body() createStudentDto: CreateStudentDto) {
-    return this.studentService.create(createStudentDto);
+  async create(@Body() createStudentDto: CreateStudentDto) {
+    console.log('[POST /student] Received data:', createStudentDto);
+    try {
+      const result = await this.studentService.create(createStudentDto);
+      console.log('[POST /student] ✅ Created successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('[POST /student] ❌ Error:', error);
+      throw error;
+    }
   }
 
   @Get()

@@ -1,187 +1,213 @@
-   <div class="container mx-auto px-4 py-8">
-      <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-          <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-white">
-         
-            </h1>
-            <button 
-             routerLink="./../"
-              class="text-white hover:text-gray-200 transition-colors">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Form -->
-        <form [formGroup]="userForm" (ngSubmit)="Onsubmit()" class="p-6 space-y-6">
-          <!-- Personal Information Section -->
-          <div class="border-b border-gray-200 pb-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- First Name -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  First Name <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text"
-                  formControlName="firstName"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  [class.border-red-500]="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched">
-                <div *ngIf="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched" 
-                     class="mt-1 text-sm text-red-600">
-                  First name is required
-                </div>
-              </div>
-
-              <!-- Last Name -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text"
-                  formControlName="lastName"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  [class.border-red-500]="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched">
-                <div *ngIf="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched" 
-                     class="mt-1 text-sm text-red-600">
-                  Last name is required
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Contact Information Section -->
-          <div class="border-b border-gray-200 pb-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
-            <div class="space-y-4">
-              <!-- Email -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Email <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="email"
-                  formControlName="email"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  [class.border-red-500]="userForm.get('email')?.invalid && userForm.get('email')?.touched">
-                <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" 
-                     class="mt-1 text-sm text-red-600">
-                  <span *ngIf="userForm.get('email')?.errors?.['required']">Email is required</span>
-                  <span *ngIf="userForm.get('email')?.errors?.['email']">Please enter a valid email</span>
-                </div>
-              </div>
-
-              <!-- Phone -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                <input 
-                  type="tel"
-                  formControlName="phone"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- Address Information Section -->
-          <div class="border-b border-gray-200 pb-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Address Information</h3>
-            <div class="space-y-4">
-              <!-- Address -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                <textarea 
-                  formControlName="address"
-                  rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-              </div>
-
-              <!-- Zip Code -->
-              <div class="md:w-1/2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Zip Code</label>
-                <input 
-                  type="text"
-                  formControlName="zipCode"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              </div>
-            </div>
-          </div>
-
-          <!-- Security Section -->
-          <div class="border-b border-gray-200 pb-6" >
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Security</h3>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Password <span class="text-red-500">*</span>
-              </label>
-              <input 
-                type="password"
-                formControlName="password"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                [class.border-red-500]="userForm.get('password')?.invalid && userForm.get('password')?.touched">
-              <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" 
-                   class="mt-1 text-sm text-red-600">
-                <span *ngIf="userForm.get('password')?.errors?.['required']">Password is required</span>
-                <span *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Profile Section -->
-          <div class="pb-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Profile</h3>
-            <div class="space-y-4">
-              <!-- Picture URL -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Picture URL</label>
-                <input 
-                  type="url"
-                  formControlName="picture"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <div *ngIf="userForm.get('picture')?.value" class="mt-2">
-                  <img 
-                    [src]="userForm.get('picture')?.value" 
-                    alt="Profile preview"
-                    class="h-16 w-16 rounded-full object-cover border-2 border-gray-300"
-                    (error)="onImageError($event)">
-                </div>
-              </div>
-
-              <!-- Active Status (Edit mode only) -->
-              <div  class="flex items-center">
-                <input 
-                  type="checkbox"
-                  formControlName="active"
-                  id="active"
-                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <label for="active" class="ml-2 text-sm text-gray-700">Active</label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Form Actions -->
-          <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-            <button 
-              type="button"
-              routerLink="./../"
-              class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-              Cancel
-            </button>
-            <button 
-              type="submit"
-              [disabled]="userForm.invalid "
-              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2">
-              <svg  class="animate-spin h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-              </svg>
-              <span>Saving</span>
-            </button>
-          </div>
-        </form>
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-white">Ajouter un Utilisateur</h1>
+        <button 
+          (click)="goBack()"
+          class="text-white hover:text-gray-200 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
       </div>
     </div>
+
+    <!-- Success Message -->
+    <div *ngIf="showSuccess" class="bg-green-50 border border-green-200 text-green-800 px-6 py-4">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        {{ successMessage }}
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="showError" class="bg-red-50 border border-red-200 text-red-800 px-6 py-4">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+      <!-- Personal Information Section -->
+      <div class="border-b border-gray-200 pb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Informations Personnelles</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- First Name -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Prénom <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="text"
+              formControlName="firstName"
+              placeholder="Jean"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="submitted && f['firstName']?.invalid">
+            <div *ngIf="submitted && f['firstName']?.invalid" class="mt-1 text-sm text-red-600">
+              Le prénom est requis
+            </div>
+          </div>
+
+          <!-- Last Name -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Nom <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="text"
+              formControlName="lastName"
+              placeholder="Dupont"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="submitted && f['lastName']?.invalid">
+            <div *ngIf="submitted && f['lastName']?.invalid" class="mt-1 text-sm text-red-600">
+              Le nom est requis
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information Section -->
+      <div class="border-b border-gray-200 pb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Informations de Contact</h3>
+        <div class="space-y-4">
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Email <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="email"
+              formControlName="email"
+              placeholder="jean@example.com"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="submitted && f['email']?.invalid">
+            <div *ngIf="submitted && f['email']?.invalid" class="mt-1 text-sm text-red-600">
+              <span *ngIf="f['email']?.errors?.['required']">L'email est requis</span>
+              <span *ngIf="f['email']?.errors?.['email']">Email invalide</span>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+            <input 
+              type="tel"
+              formControlName="phone"
+              placeholder="06XXXXXXXX"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Information Section -->
+      <div class="border-b border-gray-200 pb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Adresse</h3>
+        <div class="space-y-4">
+          <!-- Address -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
+            <textarea 
+              formControlName="address"
+              placeholder="123 Rue de la Paix"
+              rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+          </div>
+
+          <!-- Zip Code -->
+          <div class="md:w-1/2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Code Postal</label>
+            <input 
+              type="text"
+              formControlName="zipCode"
+              placeholder="75000"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Section -->
+      <div class="border-b border-gray-200 pb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Sécurité</h3>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Mot de passe <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="password"
+            formControlName="password"
+            placeholder="Minimum 6 caractères"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="submitted && f['password']?.invalid">
+          <div *ngIf="submitted && f['password']?.invalid" class="mt-1 text-sm text-red-600">
+            <span *ngIf="f['password']?.errors?.['required']">Le mot de passe est requis</span>
+            <span *ngIf="f['password']?.errors?.['minlength']">Minimum 6 caractères</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Section -->
+      <div class="pb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Profil</h3>
+        <div class="space-y-4">
+          <!-- Picture URL -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">URL de la photo</label>
+            <input 
+              type="url"
+              formControlName="picture"
+              placeholder="https://example.com/image.jpg"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <div *ngIf="f['picture']?.value" class="mt-2">
+              <img 
+                [src]="f['picture']?.value" 
+                alt="Profile preview"
+                class="h-16 w-16 rounded-full object-cover border-2 border-gray-300"
+                (error)="onImageError($event)">
+            </div>
+          </div>
+
+          <!-- Active Status -->
+          <div class="flex items-center">
+            <input 
+              type="checkbox"
+              formControlName="active"
+              id="active"
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <label for="active" class="ml-2 text-sm text-gray-700">Actif</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+        <button 
+          type="button"
+          (click)="goBack()"
+          class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          Annuler
+        </button>
+        <button 
+          type="submit"
+          [disabled]="loading"
+          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2">
+          <span *ngIf="!loading">Créer l'utilisateur</span>
+          <span *ngIf="loading" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Creating...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: education
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    image: eline2016/devopspfe-auth-service:v1
+    ports:
+      - "3001:3001"
+    environment:
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: education
+      USER_SERVICE_URL: http://user-service:3002
+    networks:
+      - app-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  user-service:
+    image: eline2016/devopspfe-user-service:v1
+    ports:
+      - "3002:3002"
+    environment:
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: education
+    networks:
+      - app-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  gateway-backend:
+    image: eline2016/devopspfe-gateway-backend:v1
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: education
+    networks:
+      - app-network
+    depends_on:
+      - auth-service
+      - user-service
+
+  frontend-app:
+    image: eline2016/devopspfe-frontend-app:v1
+    ports:
+      - "31927:4200"
+    networks:
+      - app-network
+    depends_on:
+      - gateway-backend
+
+networks:
+  app-network:
+    driver: bridge

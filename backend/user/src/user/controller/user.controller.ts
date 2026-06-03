@@ -7,45 +7,66 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // Health check
+  // Health check - MUST BE BEFORE :id
   @Get('health')
   healthCheck() {
+    console.log('[GET /user/health]');
     return { status: 'ok' };
   }
 
-  // Liste des utilisateurs
-  @Get()
-  find(): any {
-    return this.userService.findUsers();
+  // Delete multiple - MUST BE BEFORE :id
+  @Post('deleteMultipleUser')
+  removeMultiple(@Body() tab: any) {
+    console.log('[POST /user/deleteMultipleUser] Received:', tab);
+    return this.userService.removeMultiple(tab);
   }
 
-  @Post()
-  async createUser(@Body() userDto: CreateUserDto) {
-    return this.userService.createUser(userDto);
-  }
-
-  @Patch(':id')
-  async replaceById(@Param('id') id: number, @Body() userDto: UpdateUserDto) {
-    return this.userService.replaceById(id, userDto);
-  }
-
-  @Get(':id')
-  findById(@Param('id') id: number) {
-    return this.userService.findById(id);
-  }
-    @Get('email/:email')
+  // Find by email - MUST BE BEFORE :id
+  @Get('email/:email')
   findByEmail(@Param('email') email: string) {
+    console.log('[GET /user/email/:email] Email:', email);
     return this.userService.findOne(email);
   }
 
+  // Create user
+  @Post()
+  async createUser(@Body() userDto: CreateUserDto) {
+    console.log('[POST /user] Received:', userDto);
+    try {
+      const result = await this.userService.createUser(userDto);
+      console.log('[POST /user] ✅ Created:', result);
+      return result;
+    } catch (error) {
+      console.error('[POST /user] ❌ Error:', error);
+      throw error;
+    }
+  }
+
+  // Get all users
+  @Get()
+  find(): any {
+    console.log('[GET /user]');
+    return this.userService.findUsers();
+  }
+
+  // Update user by ID - AFTER specific routes
+  @Patch(':id')
+  async replaceById(@Param('id') id: number, @Body() userDto: UpdateUserDto) {
+    console.log('[PATCH /user/:id] ID:', id, 'Data:', userDto);
+    return this.userService.replaceById(id, userDto);
+  }
+
+  // Get user by ID - AFTER specific routes
+  @Get(':id')
+  findById(@Param('id') id: number) {
+    console.log('[GET /user/:id] ID:', id);
+    return this.userService.findById(id);
+  }
+
+  // Delete user by ID - AFTER specific routes
   @Delete(':id')
   remove(@Param('id') id: number) {
+    console.log('[DELETE /user/:id] ID:', id);
     return this.userService.remove(id);
   }
-
-  @Post('deleteMultipleUser')
-  removeMultiple(@Body() tab: any) {
-    return this.userService.removeMultiple(tab);
-  }
 }
-

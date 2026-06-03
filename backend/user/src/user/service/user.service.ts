@@ -22,20 +22,28 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    console.log('usser',createUserDto)
+    console.log('[createUser] Received:', createUserDto);
+    
     const salt = 10;
     const saltRound = await bcrypt.genSalt(salt);
     const hash = await bcrypt.hash(createUserDto.password, saltRound);
 
-    createUserDto.password = hash;
-    createUserDto.saltRounds = saltRound;
+    // Create user object with hashed password
+    const userData: any = {
+      ...createUserDto,
+      password: hash,
+      saltRounds: saltRound,
+    };
 
-    const user = this.userRepository.create(createUserDto);
-    console.log('user create ',user)
+    const user = this.userRepository.create(userData);
+    console.log('[createUser] Saving user:', user);
+    
     try {
-        return this.userRepository.save(user);
-
+      const result = await this.userRepository.save(user);
+      console.log('[createUser] ✅ User created:', result);
+      return result;
     } catch (e) {
+      console.error('[createUser] ❌ Error:', e);
       if (/(email)[\s\S]+(existe déjà)/.test(e.detail)) {
         throw new BadRequestException(
           'Le compte avec cette adresse e-mail existe déjà.',

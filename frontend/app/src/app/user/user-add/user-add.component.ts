@@ -7,22 +7,22 @@ import { Router } from '@angular/router';
   selector: 'app-user-add',
   templateUrl: './user-add.component.html',
   styleUrl: './user-add.component.css',
-  standalone: false  // AJOUTEZ CETTE LIGNE
+  standalone: false
 })
 export class UserADDComponent implements OnInit {
-  onImageError($event: ErrorEvent) {
-    throw new Error('Method not implemented.');
-  }
-  currentStep: number = 1;
-  maxSteps: number = 3;
-  isFinalStep: boolean = false;
-
   userForm: FormGroup;
-  msg: string = "";
-  show: boolean = false;
-  showError: boolean = false;
+  submitted = false;
+  loading = false;
+  showSuccess = false;
+  showError = false;
+  errorMessage = '';
+  successMessage = '';
 
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private router: Router
+  ) {
     this.userForm = this.fb.group({
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
@@ -37,46 +37,58 @@ export class UserADDComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("userForm");
-  }
-  
-  goToPreviousStep(): void {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
+    console.log('✅ User Add Component initialized');
   }
 
-  goToNextStep(): void {
-    if (this.currentStep < this.maxSteps) {
-      this.currentStep++;
-    }
+  onImageError($event: ErrorEvent) {
+    console.error('Image load error:', $event);
   }
-  
-  Onsubmit() {
-    // Initialiser l'objet user correctement
-    let user: any = {};
-    console.log('hello', this.userForm.value);
-      
-    // Utiliser directement les valeurs du formulaire
-    user.firstName = this.userForm.get('firstName')?.value;
-    user.lastName = this.userForm.get('lastName')?.value;
-    user.email = this.userForm.get('email')?.value;
-    user.phone = this.userForm.get('phone')?.value;
-    user.address = this.userForm.get('address')?.value;
-    user.zipCode = this.userForm.get('zipCode')?.value;
-    user.picture = this.userForm.get('picture')?.value;
-    user.password = this.userForm.get('password')?.value;
-    user.active = this.userForm.get('active')?.value;
-      
-    console.log("user§§§§§§§§§§§§§§§§§§§§", user);
-    
-    this.userService.createUser(user).subscribe(data => {
-      console.log("data", data);
-      this.show = true;
-      this.msg = "Utilisateur ajouté avec succès !";
-    }, error => {
+
+  onSubmit(): void {
+    this.submitted = true;
+    console.log('✅ Form submitted');
+    console.log('Form status:', this.userForm.status);
+    console.log('Form value:', this.userForm.value);
+
+    if (this.userForm.invalid) {
+      console.error('❌ Form invalid');
       this.showError = true;
-      this.msg = "Veuillez remplir tous les champs correctement";
+      this.errorMessage = 'Veuillez remplir tous les champs correctement';
+      return;
+    }
+
+    this.loading = true;
+    this.showError = false;
+    this.showSuccess = false;
+
+    console.log('📡 Creating user:', this.userForm.value);
+
+    this.userService.createUser(this.userForm.value).subscribe({
+      next: (response: any) => {
+        console.log('✅ User created successfully:', response);
+        this.loading = false;
+        this.showSuccess = true;
+        this.successMessage = 'Utilisateur ajouté avec succès !';
+        
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          this.router.navigate(['/user']);
+        }, 2000);
+      },
+      error: (error: any) => {
+        console.error('❌ Error creating user:', error);
+        this.loading = false;
+        this.showError = true;
+        this.errorMessage = error?.error?.message || 'Erreur lors de la création de l\'utilisateur';
+      }
     });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/user']);
+  }
+
+  get f() {
+    return this.userForm.controls;
   }
 }

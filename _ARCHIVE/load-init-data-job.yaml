@@ -1,0 +1,138 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-init-data-now
+  namespace: education
+spec:
+  template:
+    spec:
+      containers:
+      - name: psql
+        image: postgres:15
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        volumeMounts:
+        - name: script
+          mountPath: /scripts
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Créer les tables..."
+          psql -h postgres-service -U postgres -d education <<'TABLES'
+          CREATE TABLE IF NOT EXISTS teacher (
+            id SERIAL PRIMARY KEY,
+            "indexNumber" VARCHAR UNIQUE NOT NULL,
+            cin VARCHAR NOT NULL,
+            "firstName" VARCHAR NOT NULL,
+            surname VARCHAR NOT NULL,
+            gender VARCHAR NOT NULL,
+            address VARCHAR NOT NULL,
+            telephone VARCHAR NOT NULL,
+            email VARCHAR UNIQUE NOT NULL,
+            password VARCHAR,
+            facebook VARCHAR,
+            instagram VARCHAR,
+            linkedin VARCHAR,
+            specialization VARCHAR NOT NULL,
+            "profileImage" VARCHAR,
+            "createdAt" TIMESTAMP DEFAULT NOW(),
+            "dateOfMandate" TIMESTAMP NOT NULL
+          );
+          
+          CREATE TABLE IF NOT EXISTS parent (
+            id SERIAL PRIMARY KEY,
+            "firstName" VARCHAR NOT NULL,
+            "lastName" VARCHAR NOT NULL,
+            email VARCHAR UNIQUE NOT NULL,
+            "phoneNumber" VARCHAR NOT NULL,
+            "NCIN" VARCHAR NOT NULL,
+            address VARCHAR NOT NULL,
+            "typeInsurance" VARCHAR NOT NULL,
+            "Numeroinsurance" VARCHAR NOT NULL,
+            job VARCHAR NOT NULL
+          );
+          
+          CREATE TABLE IF NOT EXISTS classroom (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR NOT NULL,
+            capacity INTEGER NOT NULL,
+            grade VARCHAR NOT NULL,
+            description VARCHAR,
+            "academicYear" VARCHAR NOT NULL,
+            "isActive" BOOLEAN DEFAULT true,
+            location VARCHAR(50) NOT NULL,
+            "Specialization" VARCHAR NOT NULL
+          );
+          
+          CREATE TABLE IF NOT EXISTS student (
+            id SERIAL PRIMARY KEY,
+            "firstName" VARCHAR NOT NULL,
+            "numeroInscriptio" VARCHAR NOT NULL,
+            "lastName" VARCHAR NOT NULL,
+            email VARCHAR UNIQUE NOT NULL,
+            "dateOfBirth" DATE NOT NULL,
+            "phoneNumber" VARCHAR NOT NULL,
+            address VARCHAR NOT NULL,
+            "isActive" BOOLEAN DEFAULT true,
+            "enrollmentDate" DATE NOT NULL,
+            "parentId" INTEGER,
+            "classroomId" INTEGER,
+            FOREIGN KEY ("parentId") REFERENCES parent(id),
+            FOREIGN KEY ("classroomId") REFERENCES classroom(id)
+          );
+          
+          CREATE TABLE IF NOT EXISTS activity (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR NOT NULL,
+            type VARCHAR,
+            description TEXT,
+            location VARCHAR,
+            date TIMESTAMP NOT NULL,
+            duration INTEGER,
+            "isCompleted" BOOLEAN DEFAULT false,
+            metadata TEXT,
+            "classroomId" INTEGER,
+            FOREIGN KEY ("classroomId") REFERENCES classroom(id)
+          );
+          
+          CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            "firstName" TEXT,
+            "lastName" TEXT,
+            phone TEXT,
+            picture TEXT,
+            address TEXT,
+            zipcode TEXT,
+            password TEXT,
+            "saltRounds" TEXT,
+            token TEXT,
+            active BOOLEAN DEFAULT true,
+            "createdAt" TIMESTAMP WITH TIME ZONE,
+            "createdBy" INTEGER,
+            "updatedAt" TIMESTAMP WITH TIME ZONE,
+            "updatedBy" INTEGER,
+            "deletedAt" TIMESTAMP WITH TIME ZONE
+          );
+          TABLES
+          
+          echo "Tables créées. Chargement des données..."
+          psql -h postgres-service -U postgres -d education -f /scripts/data.sql
+          
+          echo "Vérification des données..."
+          psql -h postgres-service -U postgres -d education <<'VERIFY'
+          SELECT 'Vérification:' AS status;
+          SELECT COUNT(*) AS teachers FROM teacher;
+          SELECT COUNT(*) AS parents FROM parent;
+          SELECT COUNT(*) AS classrooms FROM classroom;
+          SELECT COUNT(*) AS students FROM student;
+          SELECT COUNT(*) AS activities FROM activity;
+          VERIFY
+      volumes:
+      - name: script
+        configMap:
+          name: init-data
+      restartPolicy: Never
+  backoffLimit: 3

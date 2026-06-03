@@ -1,4 +1,4 @@
-﻿# =============================================
+# =============================================
 # Stage 1 : Build de l'application Angular
 # =============================================
 FROM node:20-alpine AS build
@@ -20,6 +20,9 @@ RUN npm run build -- --configuration production
 # Stage 2 : Serveur nginx + proxy
 # =============================================
 FROM nginx:alpine
+
+# Supprime le default.conf pour utiliser uniquement notre config
+RUN rm -f /etc/nginx/conf.d/default.conf
 
 # Copie des fichiers statiques générés (dans le sous-dossier browser)
 COPY --from=build /app/dist/front/browser /usr/share/nginx/html

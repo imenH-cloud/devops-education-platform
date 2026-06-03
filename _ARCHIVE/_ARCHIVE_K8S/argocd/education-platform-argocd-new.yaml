@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: education-platform
+  namespace: argocd-new
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/imenH-cloud/devops-education-platform.git
+    targetRevision: main
+    path: kubernetes
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: education
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+  info:
+    - name: 'GitHub Repository'
+      value: 'https://github.com/imenH-cloud/devops-education-platform'
+    - name: 'Docker Images'
+      value: 'eline2016/* (latest versions from Docker Hub)'
+    - name: 'Services'
+      value: 'auth, user, activity, parent, student, classroom, teacher, gateway, frontend'

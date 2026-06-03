@@ -21,7 +21,6 @@ export interface PaginatedResponse<T> {
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = '/api';
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   public isLoading$ = this.isLoadingSubject.asObservable();
 
@@ -33,12 +32,14 @@ export class ApiService {
 
   get<T>(endpoint: string, params?: HttpParams): Observable<ApiResponse<T>> {
     this.setLoading(true);
+    console.log('API GET:', endpoint);
     return this.http
-      .get<ApiResponse<T>>(`${this.baseUrl}${endpoint}`, { params })
+      .get<ApiResponse<T>>(endpoint, { params, withCredentials: true })
       .pipe(
         tap(() => this.setLoading(false)),
         catchError((error) => {
           this.setLoading(false);
+          console.error('API Error:', error);
           throw error;
         }),
       );
@@ -46,12 +47,14 @@ export class ApiService {
 
   post<T>(endpoint: string, body: any): Observable<ApiResponse<T>> {
     this.setLoading(true);
+    console.log('API POST:', endpoint);
     return this.http
-      .post<ApiResponse<T>>(`${this.baseUrl}${endpoint}`, body)
+      .post<ApiResponse<T>>(endpoint, body, { withCredentials: true })
       .pipe(
         tap(() => this.setLoading(false)),
         catchError((error) => {
           this.setLoading(false);
+          console.error('API Error:', error);
           throw error;
         }),
       );
@@ -59,12 +62,14 @@ export class ApiService {
 
   put<T>(endpoint: string, body: any): Observable<ApiResponse<T>> {
     this.setLoading(true);
+    console.log('API PUT:', endpoint);
     return this.http
-      .put<ApiResponse<T>>(`${this.baseUrl}${endpoint}`, body)
+      .put<ApiResponse<T>>(endpoint, body, { withCredentials: true })
       .pipe(
         tap(() => this.setLoading(false)),
         catchError((error) => {
           this.setLoading(false);
+          console.error('API Error:', error);
           throw error;
         }),
       );
@@ -72,12 +77,14 @@ export class ApiService {
 
   delete<T>(endpoint: string): Observable<ApiResponse<T>> {
     this.setLoading(true);
+    console.log('API DELETE:', endpoint);
     return this.http
-      .delete<ApiResponse<T>>(`${this.baseUrl}${endpoint}`)
+      .delete<ApiResponse<T>>(endpoint, { withCredentials: true })
       .pipe(
         tap(() => this.setLoading(false)),
         catchError((error) => {
           this.setLoading(false);
+          console.error('API Error:', error);
           throw error;
         }),
       );

@@ -14,8 +14,12 @@ export class StudentService {
   ) {}
 
   async create(createStudentDto: CreateStudentDto): Promise<Student> {
-    const student = await  this.studentRepository.create(createStudentDto);
-
+    const studentData = {
+      ...createStudentDto,
+      parent: createStudentDto.parentId ? { id: createStudentDto.parentId } : undefined,
+      classroom: createStudentDto.classroomId ? { id: createStudentDto.classroomId } : undefined,
+    };
+    const student = this.studentRepository.create(studentData);
     console.log('Creating student:!!!!!!!!!!', student);
     return await this.studentRepository.save(student);
   }

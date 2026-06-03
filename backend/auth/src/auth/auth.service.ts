@@ -17,17 +17,33 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<any> {
     try {
       const userServiceUrl = process.env.USER_SERVICE_URL || 'http://user-service:3002';
+      console.log('Fetching user from:', `${userServiceUrl}/user/email/${email}`);
       const response = await firstValueFrom(
         this.httpService.get(`${userServiceUrl}/user/email/${email}`)
       );
       const user = response.data;
+      console.log('User fetched:', user);
 
       if (!user) {
         throw new NotFoundException('Utilisateur non trouvé');
       }
 
       // Compare le mot de passe fourni avec le hash récupéré
-      const passwordMatches = await bcrypt.compare(pass, user.password);
+      let passwordMatches = false;
+      console.log('Password from DB:', user.password);
+      console.log('Password provided:', pass);
+      console.log('Password starts with $2?', user.password && user.password.startsWith('$2'));
+      
+      if (user.password && user.password.startsWith('$2')) {
+        // Bcrypt hash
+        console.log('Using bcrypt comparison');
+        passwordMatches = await bcrypt.compare(pass, user.password);
+      } else {
+        // Plaintext comparison for testing/development
+        console.log('Using plaintext comparison');
+        passwordMatches = pass === user.password;
+      }
+      console.log('Password matches result:', passwordMatches);
 
       if (!passwordMatches) {
         throw new UnauthorizedException('Email et/ou mot de passe sont incorrects');
@@ -35,14 +51,13 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      // Erreur globale (ex: microservice down ou pas trouvé)
+      console.error('Auth validation error:', error.message || error);
       throw new UnauthorizedException('Email et/ou mot de passe sont incorrects');
     }
   }
 
   // Login : valide l'utilisateur et génère un token JWT
   async login(user: AuthUserDto) {
-    // validateUser lance une erreur si échec
     const userData = await this.validateUser(user.email, user.password);
 
     const payload = {
@@ -50,7 +65,7 @@ export class AuthService {
       email: userData.email,
     };
 
-    const expiresIn = user.rememberMe ? 24 * 60 * 60 : 2 * 60 * 60; // en secondes
+    const expiresIn = user.rememberMe ? 24 * 60 * 60 : 2 * 60 * 60;
 
     return {
       idUser: userData.id,
@@ -61,4 +76,3 @@ export class AuthService {
     };
   }
 }
-

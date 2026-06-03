@@ -1,0 +1,119 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"finalizers":["resources-finalizer.argocd.argoproj.io"],"name":"education-platform","namespace":"argocd"},"spec":{"destination":{"namespace":"education","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"gitops-new/base","repoURL":"https://github.com/imenH-cloud/devops-education-platform.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":true,"selfHeal":true},"retry":{"backoff":{"duration":"5s","factor":2,"maxDuration":"3m"},"limit":5},"syncOptions":["CreateNamespace=true"]}}}
+  creationTimestamp: "2026-05-20T00:27:12Z"
+  deletionGracePeriodSeconds: 0
+  deletionTimestamp: "2026-05-20T00:29:53Z"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  generation: 3
+  name: education-platform
+  namespace: argocd
+  resourceVersion: "1073627"
+  uid: 50a3c889-714a-4126-a116-eec05ce37f29
+spec:
+  destination:
+    namespace: education
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: gitops-new/base
+    repoURL: https://github.com/imenH-cloud/devops-education-platform.git
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+      limit: 5
+    syncOptions:
+    - CreateNamespace=true
+status:
+  conditions:
+  - lastTransitionTime: "2026-05-20T00:27:12Z"
+    message: 'Failed to load target state: failed to generate manifest for source
+      1 of 1: rpc error: code = Unknown desc = gitops-new/base: app path does not
+      exist'
+    type: ComparisonError
+  controllerNamespace: argocd
+  health:
+    status: Healthy
+  reconciledAt: "2026-05-20T00:27:12Z"
+  resourceHealthSource: appTree
+  resources:
+  - group: apps
+    kind: Deployment
+    name: activity-service-deployment
+    namespace: education
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: auth-service-deployment
+    namespace: education
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: classroom-service-deployment
+    namespace: education
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: gateway-backend-deployment
+    namespace: education
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: prometheus-deployment
+    namespace: education
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: teacher-service-deployment
+    namespace: education
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: user-service-deployment
+    namespace: education
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  summary:
+    images:
+    - devopspfe-activity-service:latest
+    - devopspfe-classroom-service:latest
+    - devopspfe-gateway-backend:latest
+    - devopspfe-teacher-service:latest
+    - devopspfe-user-service:latest
+    - eline2016/devopspfe-auth-service:52
+    - prom/prometheus:v2.37.0
+  sync:
+    comparedTo:
+      destination:
+        namespace: education
+        server: https://kubernetes.default.svc
+      source:
+        path: gitops-new/base
+        repoURL: https://github.com/imenH-cloud/devops-education-platform.git
+        targetRevision: main
+    revision: main
+    status: Unknown

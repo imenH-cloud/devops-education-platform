@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 
 export interface Activity {
   id?: number;
@@ -27,12 +26,28 @@ export interface Activity {
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/activity`;
   
-  getAll(): Observable<Activity[]> { return this.http.get<Activity[]>(this.apiUrl); }
-  findAll(): Observable<Activity[]> { return this.getAll(); }
-  getById(id: number): Observable<Activity> { return this.http.get<Activity>(`${this.apiUrl}/${id}`); }
-  create(activity: Activity): Observable<Activity> { return this.http.post<Activity>(this.apiUrl, activity); }
-  update(id: number, activity: Activity): Observable<Activity> { return this.http.patch<Activity>(`${this.apiUrl}/${id}`, activity); }
-  delete(id: number): Observable<any> { return this.http.delete(`${this.apiUrl}/${id}`); }
+  getAll(): Observable<Activity[]> { 
+    return this.http.get<Activity[]>('/activity', { withCredentials: true }); 
+  }
+  
+  findAll(): Observable<Activity[]> { 
+    return this.getAll(); 
+  }
+  
+  getById(id: number): Observable<Activity> { 
+    return this.http.get<Activity>(`/activity/${id}`, { withCredentials: true }); 
+  }
+  
+  create(activity: Activity): Observable<Activity> { 
+    return this.http.post<Activity>('/activity', activity, { withCredentials: true }); 
+  }
+  
+  update(id: number, activity: Activity): Observable<Activity> { 
+    return this.http.patch<Activity>(`/activity/${id}`, activity, { withCredentials: true }); 
+  }
+  
+  delete(id: number): Observable<any> { 
+    return this.http.delete(`/activity/${id}`, { withCredentials: true }); 
+  }
 }

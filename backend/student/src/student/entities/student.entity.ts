@@ -40,6 +40,12 @@ export class Student {
   @Column({ type: 'date' })
   enrollmentDate: Date;
 
+  @Column({ type: 'text', nullable: true })
+  observations: string;
+
+  @Column({ type: 'json', nullable: true })
+  interventionReports: Record<string, any>[];
+
   @ManyToOne(() => Parent, (parent) => parent.students)
   @JoinColumn({ name: 'parentId' })
   parent: Parent;

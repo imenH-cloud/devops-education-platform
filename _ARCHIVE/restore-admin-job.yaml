@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: restore-admin-data
+  namespace: education
+spec:
+  template:
+    spec:
+      containers:
+      - name: psql
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          psql -h postgres-service -U postgres -d education <<'EOF'
+          DELETE FROM users WHERE email = 'admin@school.com';
+          INSERT INTO users (email, password, "firstName", "lastName", active) 
+          VALUES ('admin@school.com', '$2b$10$sUd5PNEIskHsdJdN0KY/WuCfa/UEQRNNJaMoicghz61GXvoX1K9Ri', 'Admin', 'School', true)
+          ON CONFLICT (email) DO NOTHING;
+          SELECT 'Admin restored:' AS status;
+          SELECT email, "firstName", "lastName" FROM users WHERE email = 'admin@school.com';
+          EOF
+      restartPolicy: Never
+  backoffLimit: 3

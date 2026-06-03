@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: horizons-education
+  namespace: argocd-clean
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/imenH-cloud/devopsPFE-gitops.git
+    targetRevision: main
+    path: kubernetes/base
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: education
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    syncOptions:
+      - CreateNamespace=true

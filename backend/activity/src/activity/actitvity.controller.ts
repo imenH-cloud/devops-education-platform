@@ -1,4 +1,4 @@
-﻿import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
 import { ActivityService } from './actitvity.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
@@ -38,7 +38,7 @@ export class ActivityController {
   }
 
   @Put(':id/complete')
-  complete(@Param('id') id: string) {
+  completeActivity(@Param('id') id: string) {
     return this.activityService.completeActivity(+id);
   }
 }

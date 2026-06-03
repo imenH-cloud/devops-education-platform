@@ -1,0 +1,401 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activity-service-deployment
+  namespace: education
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: activity-service
+  template:
+    metadata:
+      labels:
+        app: activity-service
+        tier: backend
+    spec:
+      containers:
+      - name: activity-service
+        image: eline2016/devopspfe-activity-service:v5
+        ports:
+        - containerPort: 3003
+        env:
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_NAME
+          value: education
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-deployment
+  namespace: education
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        tier: backend
+    spec:
+      containers:
+      - name: auth-service
+        image: eline2016/devopspfe-auth-service:v3
+        ports:
+        - containerPort: 3001
+        env:
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_NAME
+          value: education
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: classroom-service-deployment
+  namespace: education
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: classroom-service
+  template:
+    metadata:
+      labels:
+        app: classroom-service
+        tier: backend
+    spec:
+      containers:
+      - name: classroom-service
+        image: eline2016/devopspfe-classroom-service:v4
+        ports:
+        - containerPort: 3006
+        env:
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_NAME
+          value: education
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  namespace: education
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+        tier: backend
+    spec:
+      containers:
+      - name: gateway
+        image: eline2016/devopspfe-gateway-backend:v2
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: LOG_LEVEL
+          value: info
+        - name: CORS_ORIGIN
+          value: "*"
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_NAME
+          value: education
+        - name: USER_SERVICE_HOST
+          value: user-service
+        - name: USER_SERVICE_PORT
+          value: "3002"
+        - name: AUTH_SERVICE_HOST
+          value: auth-service
+        - name: AUTH_SERVICE_PORT
+          value: "3001"
+        - name: ACTIVITY_SERVICE_HOST
+          value: activity-service
+        - name: ACTIVITY_SERVICE_PORT
+          value: "3003"
+        - name: PARENT_SERVICE_HOST
+          value: parent-service
+        - name: PARENT_SERVICE_PORT
+          value: "3004"
+        - name: STUDENT_SERVICE_HOST
+          value: student-service
+        - name: STUDENT_SERVICE_PORT
+          value: "3005"
+        - name: CLASSROOM_SERVICE_HOST
+          value: classroom-service
+        - name: CLASSROOM_SERVICE_PORT
+          value: "3006"
+        - name: TEACHER_SERVICE_HOST
+          value: teacher-service
+        - name: TEACHER_SERVICE_PORT
+          value: "3007"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parent-service-deployment
+  namespace: education
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parent-service
+  template:
+    metadata:
+      labels:
+        app: parent-service
+        tier: backend
+    spec:
+      containers:
+      - name: parent-service
+        image: eline2016/devopspfe-parent-service:v6
+        ports:
+        - containerPort: 3004
+        env:
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_NAME
+          value: education
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-service-deployment
+  namespace: education
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: student-service
+  template:
+    metadata:
+      labels:
+        app: student-service
+        tier: backend
+    spec:
+      containers:
+      - name: student-service
+        image: eline2016/devopspfe-student-service:v4
+        ports:
+        - containerPort: 3005
+        env:
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_NAME
+          value: education
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teacher-service-deployment
+  namespace: education
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: teacher-service
+  template:
+    metadata:
+      labels:
+        app: teacher-service
+        tier: backend
+    spec:
+      containers:
+      - name: teacher-service
+        image: eline2016/devopspfe-teacher-service:v1
+        ports:
+        - containerPort: 3007
+        env:
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_NAME
+          value: education
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-deployment
+  namespace: education
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+        tier: backend
+    spec:
+      containers:
+      - name: user-service
+        image: eline2016/devopspfe-user-service:v2
+        ports:
+        - containerPort: 3002
+        env:
+        - name: DB_HOST
+          value: postgres
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_NAME
+          value: education
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

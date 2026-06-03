@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';import { CreateParentDto } from '../dto/create-parent.dto';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { CreateParentDto } from '../dto/create-parent.dto';
 import { UpdateParentDto } from '../dto/update-parent.dto';
 import { ParentService } from '../service/parent.service';
 
@@ -6,8 +7,16 @@ import { ParentService } from '../service/parent.service';
 export class ParentController {
   constructor(private readonly parentService: ParentService) {}
   @Post()
-  create(@Body() createParentDto: CreateParentDto) {
-    return this.parentService.create(createParentDto);
+  async create(@Body() createParentDto: CreateParentDto) {
+    console.log('[POST /parent] Received:', createParentDto);
+    try {
+      const result = await this.parentService.create(createParentDto);
+      console.log('[POST /parent] Success:', result);
+      return result;
+    } catch (error) {
+      console.error('[POST /parent] Error:', error.message, error);
+      throw error;
+    }
   }
 
   @Get()

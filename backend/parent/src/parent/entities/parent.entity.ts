@@ -15,8 +15,8 @@ export class Parent {
     email: string
     @Column()
     phoneNumber: string;
-   @Column()
-    NCIN:number
+   @Column({ nullable: true })
+    NCIN: string
     @Column()
     address: string;
     @Column()

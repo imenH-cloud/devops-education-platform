@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: education-platform
+  namespace: gitops
+  finalizers:
+    - resources-finalizer.argoproj.io
+spec:
+  project: default
+  
+  source:
+    repoURL: https://github.com/imenH-cloud/devops-education-platform.git
+    targetRevision: main
+    path: kubernetes/backend
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: education
+  
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  revisionHistoryLimit: 10
+  
+  info:
+    - name: 'Repository'
+      value: 'https://github.com/imenH-cloud/devops-education-platform'
+    - name: 'Source'
+      value: 'kubernetes/backend (Backend Services)'

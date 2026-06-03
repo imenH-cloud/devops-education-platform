@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsNotEmpty, IsOptional, IsBoolean, IsDate, IsEmail } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsOptional, IsBoolean, IsDate, IsEmail, IsArray } from 'class-validator';
 
 export class CreateStudentDto {
     @IsNotEmpty()
@@ -36,6 +36,14 @@ export class CreateStudentDto {
     @IsNotEmpty()
     @IsDate()
     enrollmentDate: Date;
+
+    @IsOptional()
+    @IsString()
+    observations?: string;
+
+    @IsOptional()
+    @IsArray()
+    interventionReports?: Record<string, any>[];
 
     @IsOptional()
     @IsNumber()

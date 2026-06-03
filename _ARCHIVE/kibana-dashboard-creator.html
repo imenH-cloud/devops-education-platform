@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kibana Dashboard Creator - Education Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .step-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .step-content {
+            color: #555;
+            line-height: 1.6;
+            margin-left: 40px;
+        }
+        
+        .step-content ol {
+            margin-left: 20px;
+        }
+        
+        .step-content li {
+            margin-bottom: 8px;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .btn-group {
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+        
+        .timer {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            color: #0c5460;
+        }
+        
+        .field-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin: 2px;
+            font-size: 12px;
+        }
+        
+        .success-msg {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .success-msg.show {
+            display: block;
+        }
+        
+        .dashboard-preview {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Kibana Dashboard Creator</h1>
+        <p class="subtitle">Education Platform - Event Monitoring</p>
+        
+        <div class="timer">
+            ⏱️ Complete Setup in 5 Minutes - Follow the steps below
+        </div>
+        
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">0</span>
+                Prerequisites
+            </div>
+            <div class="step-content">
+                <p>✅ You already have: <span class="highlight">Event Activity Timeline</span> visualization saved</p>
+                <p>✅ You have: <span class="highlight">filebeat-logs</span> data with 2.6M documents</p>
+                <p>✅ Kibana is running at: <a href="http://localhost:30561" target="_blank">http://localhost:30561</a></p>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                Visualization 1: Pie Chart - Events by Agent
+            </div>
+            <div class="step-content">
+                <ol>
+                    <li>Go to <span class="highlight">Visualizations</span></li>
+                    <li>Click <span class="highlight">Create visualization</span></li>
+                    <li>Select <span class="highlight">Lens</span></li>
+                    <li><strong>DRAG</strong> <span class="field-badge">agent.name</span> from left sidebar to center</li>
+                    <li>Wait for Pie chart to appear automatically</li>
+                    <li>Click <span class="highlight">Save</span> (top right)</li>
+                    <li>Title: <span class="highlight">Events by Agent</span></li>
+                    <li>Click <span class="highlight">Save visualization</span></li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                Visualization 2: Metric - Total Events
+            </div>
+            <div class="step-content">
+                <ol>
+                    <li>Click <span class="highlight">Create visualization</span></li>
+                    <li>Select <span class="highlight">Lens</span></li>
+                    <li><strong>DRAG</strong> <span class="field-badge">@timestamp</span> to center <strong>ONCE</strong></li>
+                    <li>System automatically shows a BIG NUMBER</li>
+                    <li>Click <span class="highlight">Save</span></li>
+                    <li>Title: <span class="highlight">Total Events (Last 24h)</span></li>
+                    <li>Click <span class="highlight">Save visualization</span></li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                Visualization 3: Line Chart - Activity Trend
+            </div>
+            <div class="step-content">
+                <ol>
+                    <li>Click <span class="highlight">Create visualization</span></li>
+                    <li>Select <span class="highlight">Lens</span></li>
+                    <li><strong>DRAG</strong> <span class="field-badge">@timestamp</span> to center</li>
+                    <li>Top of screen: Change chart type to <span class="highlight">Line</span></li>
+                    <li>Wait for Line chart to appear</li>
+                    <li>Click <span class="highlight">Save</span></li>
+                    <li>Title: <span class="highlight">Activity Trend</span></li>
+                    <li>Click <span class="highlight">Save visualization</span></li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">4</span>
+                Visualization 4: Horizontal Bar - Top Event Types
+            </div>
+            <div class="step-content">
+                <ol>
+                    <li>Click <span class="highlight">Create visualization</span></li>
+                    <li>Select <span class="highlight">Lens</span></li>
+                    <li><strong>DRAG</strong> <span class="field-badge">aws.cloudtrail.event_type</span> to center</li>
+                    <li>Top of screen: Change chart type to <span class="highlight">Bar (horizontal)</span></li>
+                    <li>Wait for Horizontal Bar chart to appear</li>
+                    <li>Click <span class="highlight">Save</span></li>
+                    <li>Title: <span class="highlight">Top Event Types</span></li>
+                    <li>Click <span class="highlight">Save visualization</span></li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">5</span>
+                Create Dashboard
+            </div>
+            <div class="step-content">
+                <ol>
+                    <li>Left menu: Click <span class="highlight">Dashboards</span></li>
+                    <li>Click <span class="highlight">Create new dashboard</span></li>
+                    <li>Click <span class="highlight">Add</span> (top)</li>
+                    <li>Click <span class="highlight">Add existing</span></li>
+                    <li><strong>Search and ADD all 5 visualizations:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>✓ Event Activity Timeline</li>
+                            <li>✓ Events by Agent</li>
+                            <li>✓ Total Events (Last 24h)</li>
+                            <li>✓ Activity Trend</li>
+                            <li>✓ Top Event Types</li>
+                        </ul>
+                    </li>
+                    <li>Click and drag visualizations to arrange them</li>
+                    <li>Click <span class="highlight">Save</span> (top right)</li>
+                    <li>Title: <span class="highlight">Education Platform - Event Monitoring</span></li>
+                    <li>Click <span class="highlight">Save dashboard</span></li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="dashboard-preview">
+            <strong>📊 Dashboard Layout Preview</strong><br>
+            <br>
+            ┌─────────────────────────────────────────┐<br>
+            │ Total Events: 2,613 | Events by Agent   │<br>
+            ├─────────────────────────────────────────┤<br>
+            │ Activity Trend (Line Chart)             │<br>
+            ├─────────────────────────────────────────┤<br>
+            │ Event Activity Timeline (Bar Chart)     │<br>
+            ├─────────────────────────────────────────┤<br>
+            │ Top Event Types (Horizontal Bar)        │<br>
+            └─────────────────────────────────────────┘
+        </div>
+        
+        <div class="btn-group">
+            <a href="http://localhost:30561/app/visualize" target="_blank" class="btn btn-primary">
+                🚀 Open Kibana - Start Creating
+            </a>
+            <a href="http://localhost:30561/app/dashboards" target="_blank" class="btn btn-secondary">
+                📊 View Dashboards
+            </a>
+        </div>
+        
+        <div class="success-msg" id="successMsg">
+            ✅ <strong>All Done!</strong> Your dashboard is ready at: 
+            <a href="http://localhost:30561/app/dashboards" target="_blank">http://localhost:30561/app/dashboards</a>
+        </div>
+    </div>
+    
+    <script>
+        // Simple timer to motivate completion
+        let minutes = 5;
+        let seconds = 0;
+        
+        function updateTimer() {
+            if (minutes === 0 && seconds === 0) {
+                document.querySelector('.timer').innerHTML = '✅ Time\'s up! Your dashboard should be ready now. <a href="http://localhost:30561/app/dashboards" target="_blank">View it here</a>';
+                return;
+            }
+            
+            if (seconds === 0 && minutes > 0) {
+                minutes--;
+                seconds = 59;
+            } else {
+                seconds--;
+            }
+            
+            const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.querySelector('.timer').innerHTML = `⏱️ Time Remaining: ${timeStr}`;
+        }
+    </script>
+</body>
+</html>

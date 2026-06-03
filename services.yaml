@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: activity-service
+  namespace: education
+spec:
+  selector:
+    app: activity-service
+  ports:
+  - protocol: TCP
+    port: 3003
+    targetPort: 3003
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: education
+spec:
+  selector:
+    app: auth-service
+  ports:
+  - protocol: TCP
+    port: 3001
+    targetPort: 3001
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: classroom-service
+  namespace: education
+spec:
+  selector:
+    app: classroom-service
+  ports:
+  - protocol: TCP
+    port: 3006
+    targetPort: 3006
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parent-service
+  namespace: education
+spec:
+  selector:
+    app: parent-service
+  ports:
+  - protocol: TCP
+    port: 3004
+    targetPort: 3004
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-service
+  namespace: education
+spec:
+  selector:
+    app: student-service
+  ports:
+  - protocol: TCP
+    port: 3005
+    targetPort: 3005
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: teacher-service
+  namespace: education
+spec:
+  selector:
+    app: teacher-service
+  ports:
+  - protocol: TCP
+    port: 3007
+    targetPort: 3007
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: education
+spec:
+  selector:
+    app: user-service
+  ports:
+  - protocol: TCP
+    port: 3002
+    targetPort: 3002
+  type: ClusterIP

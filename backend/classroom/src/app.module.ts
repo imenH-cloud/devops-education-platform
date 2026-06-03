@@ -1,4 +1,4 @@
-﻿import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { MetricsController } from './metrics/metrics.controller';
 import { AppService } from './app.service';
@@ -41,7 +41,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         password: configService.get<string>('DB_PASSWORD', 'postgres'),
         database: configService.get<string>('DB_NAME', 'education'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
 
@@ -52,4 +52,3 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   providers: [AppService],
 })
 export class AppModule {}
-

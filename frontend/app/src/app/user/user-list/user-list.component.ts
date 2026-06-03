@@ -7,7 +7,7 @@ import { User } from '../user';
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.css',
-  standalone: false  // AJOUTEZ CETTE LIGNE
+  standalone: false
 })
 export class ListUserComponent implements OnInit {
   users: User[] = [];
@@ -23,19 +23,24 @@ export class ListUserComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('✅ ListUserComponent initialized');
     this.loadUsers();
   }
 
   loadUsers(): void {
+    console.log('📡 Loading users...');
     this.loading = true;
     this.userService.getUsers().subscribe({
-      next: (users) => {
-        this.users = users;
-        this.filteredUsers = users;
+      next: (users: any) => {
+        console.log('✅ Users loaded:', users);
+        this.users = Array.isArray(users) ? users : [];
+        this.filteredUsers = this.users;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading users:', error);
+        console.error('❌ Error loading users:', error);
+        this.users = [];
+        this.filteredUsers = [];
         this.loading = false;
       }
     });
@@ -72,35 +77,41 @@ export class ListUserComponent implements OnInit {
   }
 
   navigateToAdd(): void {
-    this.router.navigate(['/users/add']);
+    console.log('📍 Navigating to add user');
+    this.router.navigate(['/user', 'add-user']);
   }
 
   navigateToEdit(id: number): void {
-    this.router.navigate(['/users/edit', id]);
+    console.log('📍 Navigating to edit user:', id);
+    this.router.navigate(['/user', 'update-user', id]);
   }
 
   deleteUser(id: number): void {
-    if (confirm('Are you sure you want to delete this user?')) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+      console.log('🗑️ Deleting user:', id);
       this.userService.deleteUser(id).subscribe({
         next: () => {
+          console.log('✅ User deleted successfully');
           this.loadUsers();
         },
         error: (error) => {
-          console.error('Error deleting user:', error);
+          console.error('❌ Error deleting user:', error);
         }
       });
     }
   }
 
   deleteSelected(): void {
-    if (confirm(`Are you sure you want to delete ${this.selectedUsers.length} selected users?`)) {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer ${this.selectedUsers.length} utilisateurs sélectionnés ?`)) {
+      console.log('🗑️ Deleting multiple users:', this.selectedUsers);
       this.userService.deleteMultipleUsers(this.selectedUsers).subscribe({
         next: () => {
+          console.log('✅ Users deleted successfully');
           this.selectedUsers = [];
           this.loadUsers();
         },
         error: (error) => {
-          console.error('Error deleting users:', error);
+          console.error('❌ Error deleting users:', error);
         }
       });
     }
