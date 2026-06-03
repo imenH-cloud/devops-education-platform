@@ -1,13 +1,14 @@
-import { IsString, IsNumber, IsNotEmpty, IsOptional, IsBoolean, IsDate, IsEmail, IsArray } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsOptional, IsBoolean, IsISO8601, IsEmail, IsArray } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateStudentDto {
     @IsNotEmpty()
     @IsString()
     firstName: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    numeroInscriptio: string;
+    numeroInscriptio?: string;
 
     @IsNotEmpty()
     @IsString()
@@ -17,25 +18,27 @@ export class CreateStudentDto {
     @IsEmail()
     email: string;
 
-    @IsNotEmpty()
-    @IsDate()
-    dateOfBirth: Date;
+    @IsOptional()
+    @IsISO8601()
+    @Type(() => Date)
+    dateOfBirth?: Date;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    phoneNumber: string;
+    phoneNumber?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    address: string;
+    address?: string;
 
     @IsOptional()
     @IsBoolean()
     isActive?: boolean;
 
-    @IsNotEmpty()
-    @IsDate()
-    enrollmentDate: Date;
+    @IsOptional()
+    @IsISO8601()
+    @Type(() => Date)
+    enrollmentDate?: Date;
 
     @IsOptional()
     @IsString()
@@ -52,4 +55,12 @@ export class CreateStudentDto {
     @IsOptional()
     @IsNumber()
     classroomId?: number;
+
+    @IsNotEmpty()
+    @IsString()
+    password: string;
+
+    @IsOptional()
+    @IsString()
+    role?: string;
 }
