@@ -1,10 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Student } from '../entities/student.entity';
 import { CreateStudentDto } from '../dto/create-student.dto';
 import { UpdateStudentDto } from '../dto/update-student.dto';
-import { Console } from 'console';
 
 @Injectable()
 export class StudentService {
@@ -14,14 +13,35 @@ export class StudentService {
   ) {}
 
   async create(createStudentDto: CreateStudentDto): Promise<Student> {
-    const studentData = {
-      ...createStudentDto,
-      parent: createStudentDto.parentId ? { id: createStudentDto.parentId } : undefined,
-      classroom: createStudentDto.classroomId ? { id: createStudentDto.classroomId } : undefined,
-    };
-    const student = this.studentRepository.create(studentData);
-    console.log('Creating student:!!!!!!!!!!', student);
-    return await this.studentRepository.save(student);
+    try {
+      console.log('[StudentService.create] 📥 Input:', createStudentDto);
+
+      const studentData = {
+        firstName: createStudentDto.firstName,
+        lastName: createStudentDto.lastName,
+        email: createStudentDto.email,
+        dateOfBirth: createStudentDto.dateOfBirth || null,
+        phoneNumber: createStudentDto.phoneNumber || null,
+        enrollmentDate: createStudentDto.enrollmentDate || null,
+        observations: createStudentDto.observations || null,
+        medicalReports: createStudentDto.medicalReports || null,
+      };
+
+      if (createStudentDto.parentId) {
+        (studentData as any).parent = { id: createStudentDto.parentId };
+      }
+      if (createStudentDto.classroomId) {
+        (studentData as any).classroom = { id: createStudentDto.classroomId };
+      }
+
+      const student = this.studentRepository.create(studentData as any);
+      const result: Student = await this.studentRepository.save(student);
+      console.log('[StudentService.create] ✅ Success:', result.id);
+      return result;
+    } catch (error) {
+      console.error('[StudentService.create] ❌ Error:', error.message);
+      throw new BadRequestException(`Failed to create student: ${error.message}`);
+    }
   }
 
   async findAll(): Promise<Student[]> {
@@ -59,7 +79,7 @@ export class StudentService {
 
   async findByClass(classId: number): Promise<Student[]> {
     return await this.studentRepository.find({
-      where: { classroom: { id: classId } }, // ✅ correction ici
+      where: { classroom: { id: classId } },
       order: { lastName: 'ASC', firstName: 'ASC' },
     });
   }

@@ -8,55 +8,43 @@ import {
 import { Classroom } from '../shared/entities/classroom.entity';
 import { Parent } from '../shared/entities/parent.entity';
 
-@Entity()
+@Entity('student')
 export class Student {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'firstname' })
   firstName: string;
 
-  @Column()
-  numeroInscriptio: string;
-
-  @Column()
+  @Column({ name: 'lastname' })
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ name: 'email', unique: true })
   email: string;
 
-  @Column({ type: 'date' })
+  @Column({ name: 'dateofbirth', type: 'date', nullable: true })
   dateOfBirth: Date;
 
-  @Column()
+  @Column({ name: 'phonenumber', nullable: true })
   phoneNumber: string;
 
-  @Column()
-  address: string;
-
-  @Column({ default: true })
-  isActive: boolean;
-
-  @Column({ type: 'date' })
+  @Column({ name: 'enrollmentdate', type: 'date', nullable: true })
   enrollmentDate: Date;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: 'observations', type: 'text', nullable: true })
   observations: string;
 
-  @Column({ type: 'json', nullable: true })
-  interventionReports: Record<string, any>[];
+  @Column({ name: 'medicalreports', type: 'text', nullable: true })
+  medicalReports: string;
 
-  @ManyToOne(() => Parent, (parent) => parent.students)
-  @JoinColumn({ name: 'parentId' })
+  @Column({ name: 'isactive', default: true })
+  isActive: boolean;
+
+  @ManyToOne(() => Parent, (parent) => parent.students, { nullable: true })
+  @JoinColumn({ name: 'parentid' })
   parent: Parent;
 
-  // @Column()
-  // parentId: number;
-
-  @ManyToOne(() => Classroom, (classroom) => classroom.students)
-  @JoinColumn({ name: 'classroomId' })
+  @ManyToOne(() => Classroom, (classroom) => classroom.students, { nullable: true })
+  @JoinColumn({ name: 'classroomid' })
   classroom: Classroom;
-
-  // @Column()
-  // classroomId: number;
 }

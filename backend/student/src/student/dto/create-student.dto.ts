@@ -1,14 +1,10 @@
-import { IsString, IsNumber, IsNotEmpty, IsOptional, IsBoolean, IsISO8601, IsEmail, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsISO8601, IsEmail } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateStudentDto {
     @IsNotEmpty()
     @IsString()
     firstName: string;
-
-    @IsOptional()
-    @IsString()
-    numeroInscriptio?: string;
 
     @IsNotEmpty()
     @IsString()
@@ -28,14 +24,6 @@ export class CreateStudentDto {
     phoneNumber?: string;
 
     @IsOptional()
-    @IsString()
-    address?: string;
-
-    @IsOptional()
-    @IsBoolean()
-    isActive?: boolean;
-
-    @IsOptional()
     @IsISO8601()
     @Type(() => Date)
     enrollmentDate?: Date;
@@ -45,22 +33,12 @@ export class CreateStudentDto {
     observations?: string;
 
     @IsOptional()
-    @IsArray()
-    interventionReports?: Record<string, any>[];
+    @IsString()
+    medicalReports?: string;
 
     @IsOptional()
-    @IsNumber()
     parentId?: number;
 
     @IsOptional()
-    @IsNumber()
     classroomId?: number;
-
-    @IsNotEmpty()
-    @IsString()
-    password: string;
-
-    @IsOptional()
-    @IsString()
-    role?: string;
 }
