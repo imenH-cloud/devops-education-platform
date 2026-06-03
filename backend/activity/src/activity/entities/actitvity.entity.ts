@@ -1,4 +1,4 @@
-﻿import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Classroom } from '../../shared/entities/classroom.entity';
 
 @Entity()
@@ -27,7 +27,7 @@ export class Activity {
   @Column({ default: false })
   isCompleted: boolean;
 
-  @Column({ nullable: true })
+  @Column({ name: 'classroomid', nullable: true })
   classroomId: number;
 
   @Column({ type: 'simple-json', nullable: true })
@@ -37,6 +37,7 @@ export class Activity {
     comments?: string;
   };
 
-  @ManyToOne(() => Classroom, classroom => classroom.activities)
+  @ManyToOne(() => Classroom, classroom => classroom.activities, { nullable: true })
+  @JoinColumn({ name: 'classroomid' })
   classroom: Classroom;
 }

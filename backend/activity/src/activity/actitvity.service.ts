@@ -1,4 +1,4 @@
-﻿import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Activity } from './entities/actitvity.entity';
@@ -13,7 +13,18 @@ export class ActivityService {
   ) {}
 
   async create(createActivityDto: CreateActivityDto): Promise<Activity> {
-    return this.activityRepository.save(createActivityDto);
+    console.log('[POST /activity] Received data:', createActivityDto);
+    const activity = new Activity();
+    Object.assign(activity, createActivityDto);
+    console.log('[POST /activity] Saving activity:', activity);
+    try {
+      const result = await this.activityRepository.save(activity);
+      console.log('[POST /activity] ✅ Created successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('[POST /activity] ❌ Error:', error);
+      throw error;
+    }
   }
 
   async findAll(): Promise<Activity[]> {
@@ -38,7 +49,8 @@ export class ActivityService {
   }
 
   async update(id: number, updateActivityDto: UpdateActivityDto): Promise<Activity> {
-    await this.activityRepository.update(id, updateActivityDto);
+    const updateData: any = { ...updateActivityDto };
+    await this.activityRepository.update(id, updateData);
     return this.findOne(id);
   }
 

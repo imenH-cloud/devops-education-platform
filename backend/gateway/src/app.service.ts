@@ -10,6 +10,22 @@ export class AppService {
     return 'Hello World!';
   }
 
+  // ============ AUTH SERVICE METHODS ============
+  async login(authUserDto: any) {
+    try {
+      const response = await lastValueFrom(
+        this.httpService.post('http://auth-service:3001/auth/login', authUserDto)
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Login error:', error.message || error);
+      if (error.response && error.response.data) {
+        throw error.response.data;
+      }
+      throw error;
+    }
+  }
+
   // ============ USER SERVICE METHODS ============
   async getUsers() {
     const response = await lastValueFrom(
@@ -60,18 +76,10 @@ export class AppService {
     return response.data;
   }
 
-  // ============ AUTH SERVICE METHODS ============
-  async login(authUserDto: any) {
-    const response = await lastValueFrom(
-      this.httpService.post('http://auth-service:3001/auth/login', authUserDto)
-    );
-    return response.data;
-  }
-
   // ============ ACTIVITY SERVICE METHODS ============
   async getActivities() {
     const response = await lastValueFrom(
-      this.httpService.get('http://activity-service:3003/activities?page=1&limit=100')
+      this.httpService.get('http://activity-service:3003/activities')
     );
     return response.data;
   }
@@ -97,13 +105,6 @@ export class AppService {
     return response.data;
   }
 
-  async completeActivity(id: string) {
-    const response = await lastValueFrom(
-      this.httpService.put(`http://activity-service:3003/activities/${id}/complete`, {})
-    );
-    return response.data;
-  }
-
   async deleteActivity(id: string) {
     const response = await lastValueFrom(
       this.httpService.delete(`http://activity-service:3003/activities/${id}`)
@@ -114,42 +115,42 @@ export class AppService {
   // ============ PARENT SERVICE METHODS ============
   async getParents() {
     const response = await lastValueFrom(
-      this.httpService.get('http://parent-service:3005/parent')
+      this.httpService.get('http://parent-service:3004/parent')
     );
     return response.data;
   }
 
   async getParentById(id: string) {
     const response = await lastValueFrom(
-      this.httpService.get(`http://parent-service:3005/parent/${id}`)
+      this.httpService.get(`http://parent-service:3004/parent/${id}`)
     );
     return response.data;
   }
 
   async createParent(createParentDto: any) {
     const response = await lastValueFrom(
-      this.httpService.post('http://parent-service:3005/parent', createParentDto)
+      this.httpService.post('http://parent-service:3004/parent', createParentDto)
     );
     return response.data;
   }
 
   async updateParent(id: string, updateParentDto: any) {
     const response = await lastValueFrom(
-      this.httpService.patch(`http://parent-service:3005/parent/${id}`, updateParentDto)
+      this.httpService.patch(`http://parent-service:3004/parent/${id}`, updateParentDto)
     );
     return response.data;
   }
 
   async deleteParent(id: string) {
     const response = await lastValueFrom(
-      this.httpService.delete(`http://parent-service:3005/parent/${id}`)
+      this.httpService.delete(`http://parent-service:3004/parent/${id}`)
     );
     return response.data;
   }
 
   async deleteMultipleParents(ids: number[]) {
     const response = await lastValueFrom(
-      this.httpService.post('http://parent-service:3005/parent/deleteMultiple', ids)
+      this.httpService.post('http://parent-service:3004/parent/deleteMultiple', ids)
     );
     return response.data;
   }
@@ -157,35 +158,35 @@ export class AppService {
   // ============ STUDENT SERVICE METHODS ============
   async getStudents() {
     const response = await lastValueFrom(
-      this.httpService.get('http://student-service:3006/student')
+      this.httpService.get('http://student-service:3005/student')
     );
     return response.data;
   }
 
   async getStudentById(id: string) {
     const response = await lastValueFrom(
-      this.httpService.get(`http://student-service:3006/student/${id}`)
+      this.httpService.get(`http://student-service:3005/student/${id}`)
     );
     return response.data;
   }
 
   async createStudent(createStudentDto: any) {
     const response = await lastValueFrom(
-      this.httpService.post('http://student-service:3006/student', createStudentDto)
+      this.httpService.post('http://student-service:3005/student', createStudentDto)
     );
     return response.data;
   }
 
   async updateStudent(id: string, updateStudentDto: any) {
     const response = await lastValueFrom(
-      this.httpService.put(`http://student-service:3006/student/${id}`, updateStudentDto)
+      this.httpService.put(`http://student-service:3005/student/${id}`, updateStudentDto)
     );
     return response.data;
   }
 
   async deleteStudent(id: string) {
     const response = await lastValueFrom(
-      this.httpService.delete(`http://student-service:3006/student/${id}`)
+      this.httpService.delete(`http://student-service:3005/student/${id}`)
     );
     return response.data;
   }
@@ -193,35 +194,35 @@ export class AppService {
   // ============ CLASSROOM SERVICE METHODS ============
   async getClassrooms() {
     const response = await lastValueFrom(
-      this.httpService.get('http://classroom-service:3004/classroom?page=1&limit=100')
+      this.httpService.get('http://classroom-service:3006/classroom')
     );
     return response.data;
   }
 
   async getClassroomById(id: string) {
     const response = await lastValueFrom(
-      this.httpService.get(`http://classroom-service:3004/classroom/${id}`)
+      this.httpService.get(`http://classroom-service:3006/classroom/${id}`)
     );
     return response.data;
   }
 
   async createClassroom(createClassroomDto: any) {
     const response = await lastValueFrom(
-      this.httpService.post('http://classroom-service:3004/classroom', createClassroomDto)
+      this.httpService.post('http://classroom-service:3006/classroom', createClassroomDto)
     );
     return response.data;
   }
 
   async updateClassroom(id: string, updateClassroomDto: any) {
     const response = await lastValueFrom(
-      this.httpService.patch(`http://classroom-service:3004/classroom/${id}`, updateClassroomDto)
+      this.httpService.patch(`http://classroom-service:3006/classroom/${id}`, updateClassroomDto)
     );
     return response.data;
   }
 
   async deleteClassroom(id: string) {
     const response = await lastValueFrom(
-      this.httpService.delete(`http://classroom-service:3004/classroom/${id}`)
+      this.httpService.delete(`http://classroom-service:3006/classroom/${id}`)
     );
     return response.data;
   }
@@ -229,7 +230,7 @@ export class AppService {
   // ============ TEACHER SERVICE METHODS ============
   async getTeachers() {
     const response = await lastValueFrom(
-      this.httpService.get('http://teacher-service:3007/teachers?page=1&limit=100')
+      this.httpService.get('http://teacher-service:3007/teachers')
     );
     return response.data;
   }
