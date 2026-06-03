@@ -14,32 +14,33 @@ export class StudentService {
 
   async create(createStudentDto: CreateStudentDto): Promise<Student> {
     try {
-      console.log('[StudentService.create] 📥 Input:', createStudentDto);
+      console.log('[StudentService.create] Input:', createStudentDto);
 
-      const studentData = {
+      // Build data object - only BD columns
+      const data = {
         firstName: createStudentDto.firstName,
         lastName: createStudentDto.lastName,
         email: createStudentDto.email,
-        dateOfBirth: createStudentDto.dateOfBirth || null,
         phoneNumber: createStudentDto.phoneNumber || null,
+        dateOfBirth: createStudentDto.dateOfBirth || null,
         enrollmentDate: createStudentDto.enrollmentDate || null,
         observations: createStudentDto.observations || null,
         medicalReports: createStudentDto.medicalReports || null,
-      };
+      } as any;
 
       if (createStudentDto.parentId) {
-        (studentData as any).parent = { id: createStudentDto.parentId };
+        data.parent = { id: createStudentDto.parentId };
       }
       if (createStudentDto.classroomId) {
-        (studentData as any).classroom = { id: createStudentDto.classroomId };
+        data.classroom = { id: createStudentDto.classroomId };
       }
 
-      const student = this.studentRepository.create(studentData as any);
-      const result: Student = await this.studentRepository.save(student);
-      console.log('[StudentService.create] ✅ Success:', result.id);
+      // Save directly - no create() call
+      const result = await this.studentRepository.save(data);
+      console.log('[StudentService.create] Success! ID:', result.id);
       return result;
     } catch (error) {
-      console.error('[StudentService.create] ❌ Error:', error.message);
+      console.error('[StudentService.create] Error:', error.message);
       throw new BadRequestException(`Failed to create student: ${error.message}`);
     }
   }
